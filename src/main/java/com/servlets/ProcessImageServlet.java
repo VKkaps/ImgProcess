@@ -23,7 +23,7 @@ import com.image_processing.letters.EnglishAlphabet.Recursive;
  */
 
 @MultipartConfig
-public class addImage extends HttpServlet {
+public class ProcessImageServlet extends HttpServlet {
 	
     /**
 	 * 
