@@ -16,7 +16,7 @@ public class Recursive extends AbstractProcessImage{
 	private Map<Integer, Feature> mapFeatures = new HashMap<Integer, Feature>();
 	private List<Pixel> feature = new LinkedList<Pixel>();
 	private int mapPointer;
-	private Queue<Pixel> noticablePixelsQueue = new LinkedList<Pixel>();
+	private Queue<Pixel> noticablePixelsQueue = new LinkedList<Pixel>(noticablePixList);
 	
 
 	public Recursive(BufferedImage b) {
@@ -42,6 +42,7 @@ public class Recursive extends AbstractProcessImage{
 	
 	@Override
 	protected void findFeatures() {
+		System.out.println("Queue size: " + noticablePixelsQueue.size());
 		
 		try {
 			while (!noticablePixelsQueue.isEmpty()) {
@@ -79,12 +80,7 @@ public class Recursive extends AbstractProcessImage{
 			if (imagePixelArray[p.getXcoor()][topY].isNoticable()) p.setTop(imagePixelArray[p.getXcoor()][topY]);
 			if (imagePixelArray[p.getXcoor()][bottomY].isNoticable()) p.setBottom(imagePixelArray[p.getXcoor()][bottomY]);
 			
-			if (!p.isSurronded()) noticablePixelsQueue.add(p);
-			
 		}
-		
-		System.out.println("Queue size: " + noticablePixelsQueue.size());
-		
 	}
 	
 	
