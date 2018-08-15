@@ -12,6 +12,7 @@ public class Pixel {
 	private final int yCoor;	
 		
 	private boolean isNoticable;
+	private boolean isSurronded;
 	
 	
 	private Pixel left = null;
@@ -28,6 +29,7 @@ public class Pixel {
 		xCoor=X;
 		yCoor=Y;
 		isNoticable=false;
+		isSurronded=false;
 		setrgbAverage();
 	}
 	
@@ -40,6 +42,7 @@ public class Pixel {
 		xCoor=X;
 		yCoor=Y;
 		isNoticable=false;
+		isSurronded=false;
 		setrgbAverage();
 	}
 	
@@ -151,6 +154,18 @@ public class Pixel {
 	
 	public int getrgbAverage() {
 		return pixelRGBAverage;
+	}
+
+
+	public boolean isSurronded() {
+		return isSurronded;
+	}
+
+
+	public void setIsSurronded(boolean isSurronded) {
+		
+		if (this.left!=null && this.right!=null && this.top!=null && this.bottom != null) isSurronded = true;
+		else isSurronded = false;
 	}
 
 }

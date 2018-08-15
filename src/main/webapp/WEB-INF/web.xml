@@ -13,7 +13,7 @@
   
 	<servlet>
 		<servlet-name>Add Image</servlet-name>
-		<servlet-class>com.servlets.ProcessImage</servlet-class>
+		<servlet-class>com.servlets.ProcessImageServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 	    <servlet-name>Add Image</servlet-name>

@@ -16,7 +16,7 @@ public class Recursive extends AbstractProcessImage{
 	private Map<Integer, Feature> mapFeatures = new HashMap<Integer, Feature>();
 	private List<Pixel> feature = new LinkedList<Pixel>();
 	private int mapPointer;
-	private Queue<Pixel> noticablePixelsQueue = new LinkedList<Pixel>(noticablePixList);
+	private Queue<Pixel> noticablePixelsQueue = new LinkedList<Pixel>();
 	
 
 	public Recursive(BufferedImage b) {
@@ -57,7 +57,7 @@ public class Recursive extends AbstractProcessImage{
 	}
 	
 
-	/* For the each pixel, check if neighbor pixels (left, right , top, and bottom) are noticable
+	/* For each pixel, check if neighbor pixels (left, right , top, and bottom) are noticable
 	 *  or not.  If so, initialize this noticable neighbor pixel in the current pixel.
 	 */
 	
@@ -78,7 +78,12 @@ public class Recursive extends AbstractProcessImage{
 			if (imagePixelArray[rightX][p.getYcoor()].isNoticable()) p.setRight(imagePixelArray[rightX][p.getYcoor()]);
 			if (imagePixelArray[p.getXcoor()][topY].isNoticable()) p.setTop(imagePixelArray[p.getXcoor()][topY]);
 			if (imagePixelArray[p.getXcoor()][bottomY].isNoticable()) p.setBottom(imagePixelArray[p.getXcoor()][bottomY]);
+			
+			if (!p.isSurronded()) noticablePixelsQueue.add(p);
+			
 		}
+		
+		System.out.println("Queue size: " + noticablePixelsQueue.size());
 		
 	}
 	

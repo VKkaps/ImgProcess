@@ -34,7 +34,13 @@ public class ProcessImageServlet extends HttpServlet {
         Part filePart = request.getPart("file");
         InputStream fileContent = filePart.getInputStream();
         BufferedImage imBuff = ImageIO.read(fileContent);
+
+        final long startTime = System.currentTimeMillis();
         Recursive r = new Recursive(imBuff);
+        final long endTime = System.currentTimeMillis();
+
+        System.out.println("Total execution time: " + (endTime - startTime) );
+        
         imBuff = r.boxFeatures();
         String base64String = encodeToString(imBuff, "jpg");
         response.setContentType("text/html");
