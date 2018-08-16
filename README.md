@@ -1,5 +1,5 @@
 # ImgProcess
-Identifying features in JPG or PNG images.  Note: Currently, if the image is too dark or too large (>1Mb), program may crash with StackOverflow error.
+Identifying features in JPG or PNG images. 
 
 To run with Docker:
 
