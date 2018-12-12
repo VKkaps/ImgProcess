@@ -1,5 +1,5 @@
 # ImgProcess
-Identifying features in JPG or PNG images. 
+Identifying features in JPG or PNG images as fast as possible.  Designed for text based images, with a future goal of being able to identify letters.
 
 To run with Docker:
 
