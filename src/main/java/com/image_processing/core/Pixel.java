@@ -2,7 +2,6 @@ package com.image_processing.core;
 
 /*Class for an individual pixel in a digital image*/
 
-
 public class Pixel {
 
 	/*8 bit color values (0 - 255) for this Pixel*/
@@ -16,16 +15,21 @@ public class Pixel {
 	private final int yCoor;	
 		
 	private boolean isNoticable=false;
-	private boolean isSurronded=false;
+	private boolean isEdgePixel=false;
 	
-	
-	private Pixel left = null;
-	private Pixel right = null;
-	private Pixel top = null;
-	private Pixel bottom = null;
+	private Pixel noticableLeft = null;
+	private Pixel noticableRight = null;
+	private Pixel noticableTop = null;
+	private Pixel noticableBottom = null;
 	
 
-	//Constructor with individual color ints, and x,y coordinates
+	private Pixel noticableLT = null;
+	private Pixel noticableRT = null;
+	private Pixel noticableLB = null;
+	private Pixel noticableRB = null;
+	
+
+	//Constructor with individual RGB ints
  	public Pixel(int r, int g, int b, int X, int Y){
 		rVal = r;
 		gVal = g;
@@ -33,10 +37,9 @@ public class Pixel {
 		xCoor=X;
 		yCoor=Y;
 		setrgbAverage();
-	}
-	
+	}	
 
-	//Constructor with an int array, and x,y coordinates
+	//Constructor with an RGB int array
 	public Pixel(int[] pix, int X, int Y){
 		rVal = pix[0];
 		gVal = pix[1];
@@ -47,11 +50,14 @@ public class Pixel {
 	}
 	
 	
+////////////////////////Methods///////////////////////////////
+	
 	// Find the average RGB value of the pixel
 	private void setrgbAverage() { 
 		pixelRGBAverage = (rVal + gVal + bVal) / 3;		
 	}
 
+	
 	// Console print Pixel information.  For troubleshooting purposes.
 	public void printPixelRGB(){
 		System.out.println("[" + xCoor + "," + yCoor + "], " + "(R" + rVal + ", G" + gVal + ", B" + bVal + ") "
@@ -64,7 +70,7 @@ public class Pixel {
 		return rgb;
 	}
 	
-	
+	/*Every user selected image is going to have a slightly different RGB average*/
 	public void initializeIsNoticable(int imageAverageRGBvalue) {
 		if (pixelRGBAverage < imageAverageRGBvalue-25) setIsNoticable(true);
 		else setIsNoticable(false);		
@@ -79,43 +85,75 @@ public class Pixel {
 		this.isNoticable = isNoticable;
 	}	
 	
-	public Pixel getLeftNeighborPixel() {
-		return left;
+	public Pixel getLeft() {
+		return noticableLeft;
 	}
 
 
-	public void setLeftNeighborPixel(Pixel left) {
-		this.left = left;
+	public void setLeft(Pixel left) {
+		this.noticableLeft = left;
 	}
 
 
-	public Pixel getRightNeighborPixel() {
-		return right;
+	public Pixel getRight() {
+		return noticableRight;
 	}
 
 
-	public void setRightNeighborPixel(Pixel right) {
-		this.right = right;
+	public void setRight(Pixel right) {
+		this.noticableRight = right;
 	}
 
 
-	public Pixel getTopNeighborPixel() {
-		return top;
+	public Pixel getTop() {
+		return noticableTop;
 	}
 
 
-	public void setTopNeighborPixel(Pixel top) {
-		this.top = top;
+	public void setTop(Pixel top) {
+		this.noticableTop = top;
 	}
 
 
-	public Pixel getBottomNeighborPixel() {
-		return bottom;
+	public Pixel getBottom() {
+		return noticableBottom;
 	}
 
 
-	public void setBottomNeighborPixel(Pixel bottom) {
-		this.bottom = bottom;
+	public void setBottom(Pixel bottom) {
+		this.noticableBottom = bottom;
+	}
+	
+	public Pixel getNoticableLT() {
+		return noticableLT;
+	}
+
+	public void setNoticableLT(Pixel noticableLT) {
+		this.noticableLT = noticableLT;
+	}
+
+	public Pixel getNoticableRT() {
+		return noticableRT;
+	}
+
+	public void setNoticableRT(Pixel noticableRT) {
+		this.noticableRT = noticableRT;
+	}
+
+	public Pixel getNoticableLB() {
+		return noticableLB;
+	}
+
+	public void setNoticableLB(Pixel noticableLB) {
+		this.noticableLB = noticableLB;
+	}
+
+	public Pixel getNoticableRB() {
+		return noticableRB;
+	}
+
+	public void setNoticableRB(Pixel noticableRB) {
+		this.noticableRB = noticableRB;
 	}
 
 
@@ -156,22 +194,17 @@ public class Pixel {
 	public int getrgbAverage() {
 		return pixelRGBAverage;
 	}
-
-
-	public boolean isSurronded() {
-		return isSurronded;
-	}
-
-
-	public void setIsSurronded(boolean isSurronded) {
-		
-		if (this.left!=null && this.right!=null && this.top!=null && this.bottom != null) this.isSurronded = true;
-		else this.isSurronded = false;
+	
+	public void determineEdgePixel() {
+		if (noticableLeft==null || noticableRight==null || noticableTop==null || noticableBottom==null 
+				|| noticableLT==null || noticableRT==null || noticableLB==null || noticableRB==null) {
+			isEdgePixel = true;
+		}
+		else isEdgePixel = false;
 	}
 	
 	public boolean isEdgePixel() {
-		if (isSurronded) return false;
-		else return true;
+		return isEdgePixel;
 	}
 
 }

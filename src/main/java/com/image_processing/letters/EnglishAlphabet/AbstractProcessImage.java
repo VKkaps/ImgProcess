@@ -19,8 +19,11 @@ public abstract class AbstractProcessImage {
 	protected final int imageWidth;
 	protected final int imageHeight; 
 	protected Pixel[][] imagePixelArray;
-	protected List<Pixel> noticablePixList;
+	protected int averageRGBPixelvalue;
+	protected List<Pixel> noticablePixList = new ArrayList<Pixel>();;
 	Graphics2D g2d;
+	Color neon = new Color(58, 255, 20);	
+	
 	
 	
 	public AbstractProcessImage(BufferedImage b) {
@@ -28,13 +31,14 @@ public abstract class AbstractProcessImage {
 		imageWidth = rawImage.getWidth();
 		imageHeight = rawImage.getHeight();
 		imagePixelArray = new Pixel[imageWidth][imageHeight];
-		initImagePixelArray();
-		findnoticablePixels();
+		initImagePixelArray();  // Load Pixels into above array
+		findAverageRGBPixelValueForImage();
+		findNoticablePixels();
 	}
 
 	
 	/*
-	 * Initialize class field 'imagePixelArray', which is a 2-D array of type 'Pixel'
+	 * Create a new 'Pixel' object for every pixel in user provided image
 	 * */	
 	private void initImagePixelArray() {
 		for (int y = 0; y < imageHeight; y++) {
@@ -44,36 +48,52 @@ public abstract class AbstractProcessImage {
 		}	
 	}
 	
-	/*
-	 * Initializes the field 'noticablePixList'.  A pixel is determined to be noticable if it's average RGB value 
-	 * is greater than the the total image RGB average value.
+	
+	/*Iterate over every pixel to find the Average RGB value for the entire image.
 	 * 
+	 * This value will be used to determine what pixels are 'noticable' in the image.
 	 * */
-	
-	private void findnoticablePixels() {
-		noticablePixList = new ArrayList<Pixel>();
-		int averageRGBPixelvalue = findImageAverageRGBPixelvalue();
-		
-		for (int y = 1; y < imageHeight-1; y++) {
-		    for (int x = 1; x < imageWidth-1; x++) {
-		    	imagePixelArray[x][y].initializeIsNoticable(averageRGBPixelvalue);
-		    	if (imagePixelArray[x][y].isNoticable()) noticablePixList.add(imagePixelArray[x][y]);
-		    }
-		}
-	}
-	
-	private int findImageAverageRGBPixelvalue() {
-		
+	private void findAverageRGBPixelValueForImage() {	
 		int rgbSum=0;
 		
 		for (Pixel[] p: imagePixelArray) {
 		    for (Pixel currentPixel: p) {
 		    	rgbSum += currentPixel.getrgbAverage();
 		    }
-		}
-
-		return ((rgbSum) / ((rawImage.getWidth())*(rawImage.getHeight())));		
+		}		
+		averageRGBPixelvalue = ((rgbSum) / ((rawImage.getWidth())*(rawImage.getHeight())));			
 	}
+	
+	
+	/*
+	 * Initializes the field 'noticablePixList'.  A pixel is determined to be noticable if 
+	 * it's average RGB value is less than (averageRGBPixelvalue - x), where x is a
+	 * arbitrary int value.
+	 * 
+	 * Note, for loop values are offset (1 instead of 0) to prevent ArrayOutOfBounds errors.
+	 * 
+	 * */
+	
+	private void findNoticablePixels() {
+		final long startTime = System.currentTimeMillis();
+		
+		for (int y = 1; y < imageHeight-1; y++) {
+		    for (int x = 1; x < imageWidth-1; x++) {
+		    	/*For each Pixel in image, determine if it is noticable by passing in the
+		    	 * Image averageRGBPixelvalue.
+		    	 * 
+		    	 * If it is noticable add it to the noticablePix list
+		    	 * */
+		    	imagePixelArray[x][y].initializeIsNoticable(averageRGBPixelvalue);
+		    	if (imagePixelArray[x][y].isNoticable()) noticablePixList.add(imagePixelArray[x][y]);
+		    }
+		}
+		
+        final long endTime = System.currentTimeMillis();
+
+        System.out.println("findNoticablePixels execution time: " + (endTime - startTime) + " ms");      
+	}
+	
 
 	
 	/*
@@ -88,7 +108,7 @@ public abstract class AbstractProcessImage {
 	
 	public void drawNeonBox(BufferedImage b, int[] boundary) {
 		g2d = b.createGraphics();
-		g2d.setColor(new Color(58, 255, 20));  //neon
+		g2d.setColor(neon);
 		g2d.drawLine(boundary[0]-1, boundary[1]-1, boundary[2]+1, boundary[1]-1);
 		g2d.drawLine(boundary[0]-1, boundary[3]+1, boundary[2]+1, boundary[3]+1);
 		g2d.drawLine(boundary[0]-1, boundary[1]-1, boundary[0]-1, boundary[3]+1);
@@ -107,8 +127,10 @@ public abstract class AbstractProcessImage {
 	}
 	
 	
+	
 	// all child classes need their own way of implementing findFeatures()
 	protected abstract void findFeatures();
 	
 }
+
 

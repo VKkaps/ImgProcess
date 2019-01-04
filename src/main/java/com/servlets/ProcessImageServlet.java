@@ -16,7 +16,7 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.codec.binary.Base64;
 
-import com.image_processing.letters.EnglishAlphabet.Recursive;
+import com.image_processing.letters.EnglishAlphabet.RecursiveImpl;
 
 /**
  * Servlet implementation class addImage
@@ -35,11 +35,8 @@ public class ProcessImageServlet extends HttpServlet {
         InputStream fileContent = filePart.getInputStream();
         BufferedImage imBuff = ImageIO.read(fileContent);
 
-        final long startTime = System.currentTimeMillis();
-        Recursive r = new Recursive(imBuff);
-        final long endTime = System.currentTimeMillis();
+        RecursiveImpl r = new RecursiveImpl(imBuff);
 
-        System.out.println("Total execution time: " + (endTime - startTime) );
         
         imBuff = r.boxFeatures();
         String base64String = encodeToString(imBuff, "jpg");
@@ -66,3 +63,7 @@ public class ProcessImageServlet extends HttpServlet {
     }
 	
 }
+
+
+
+

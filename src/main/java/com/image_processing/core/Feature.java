@@ -6,6 +6,7 @@ public class Feature {
 
 	private List<Pixel> featureGroup;
 	private int[] boundaryArr = new int[4];
+	private Pixel topMostPix;
 	
 	public Feature(List<Pixel> group) {
 		featureGroup = group;
@@ -20,14 +21,22 @@ public class Feature {
 		int lastX = featureGroup.get(0).getXcoor();
 		int lastY = featureGroup.get(0).getYcoor();
 		
-		
+		int i=0;
+		int hold=0;
 		for (Pixel p : featureGroup) {
 			if (p.getXcoor() < firstX) firstX = p.getXcoor();
-			if (p.getYcoor() < firstY) firstY = p.getYcoor();
+			if (p.getYcoor() < firstY) {
+				firstY = p.getYcoor();
+				hold=i;
+			}
 			if (p.getXcoor() > lastX) lastX = p.getXcoor();
 			if (p.getYcoor() > lastY) lastY = p.getYcoor();
+			i++;
 		}
 		
+		topMostPix = featureGroup.get(hold);
+		//topMostPix.printPixelRGB();
+
 		boundaryArr[0] = firstX;
 		boundaryArr[1] = firstY;
 		boundaryArr[2] = lastX;
@@ -41,6 +50,16 @@ public class Feature {
 
 	public int[] getBoundaryArr() {
 		return boundaryArr;
+	}
+	
+	
+	public boolean isExternal() {
+
+//		if (topMostPix.getBottom()==null || topMostPix.getRight()==null || topMostPix.getNoticableRB()==null) {
+//			return false;
+//		}
+		
+		 return true;	
 	}
 	
 }
