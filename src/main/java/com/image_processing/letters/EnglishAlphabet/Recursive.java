@@ -69,25 +69,34 @@ public class Recursive extends AbstractProcessImage{
 		int topY;
 		int bottomY;
 		
-		for (Pixel p : noticablePixList) {
-			leftX = p.getXcoor()-1;
-			rightX = p.getXcoor()+1;
-			topY = p.getYcoor()-1;
-			bottomY = p.getYcoor()+1;
+		for (Pixel noticableP : noticablePixList) {
 			
-			if (imagePixelArray[leftX][p.getYcoor()].isNoticable()) p.setLeft(imagePixelArray[leftX][p.getYcoor()]);
-			if (imagePixelArray[rightX][p.getYcoor()].isNoticable()) p.setRight(imagePixelArray[rightX][p.getYcoor()]);
-			if (imagePixelArray[p.getXcoor()][topY].isNoticable()) p.setTop(imagePixelArray[p.getXcoor()][topY]);
-			if (imagePixelArray[p.getXcoor()][bottomY].isNoticable()) p.setBottom(imagePixelArray[p.getXcoor()][bottomY]);
+			//Temporarily store neighbor pixels.
+			leftX = noticableP.getXcoor()-1;
+			rightX = noticableP.getXcoor()+1;
+			topY = noticableP.getYcoor()-1;
+			bottomY = noticableP.getYcoor()+1;
 			
+			if (imagePixelArray[leftX][noticableP.getYcoor()].isNoticable()) {
+				noticableP.setLeftNeighborPixel(imagePixelArray[leftX][noticableP.getYcoor()]);
+			}
+			if (imagePixelArray[rightX][noticableP.getYcoor()].isNoticable()) {
+				noticableP.setRightNeighborPixel(imagePixelArray[rightX][noticableP.getYcoor()]);
+			}
+			if (imagePixelArray[noticableP.getXcoor()][topY].isNoticable()) {
+				noticableP.setTopNeighborPixel(imagePixelArray[noticableP.getXcoor()][topY]);
+			}
+			if (imagePixelArray[noticableP.getXcoor()][bottomY].isNoticable()) {
+				noticableP.setBottomNeighborPixel(imagePixelArray[noticableP.getXcoor()][bottomY]);
+			}
 		}
 	}
 	
 	
 	/*
 	 * Recursive PreOrder Traversal of noticablePixels
-	 * If a noticable pixel has a neighboring noticable pixel add pixel to a growing pixel 
-	 * list, which is a Feature.
+	 * If a noticable pixel has a neighboring noticable pixel on any side, add pixel to a growing pixel 
+	 * list - which is a Feature.
 	 */
 	
 	private void preorderTraversal(Pixel p) {
@@ -95,10 +104,10 @@ public class Recursive extends AbstractProcessImage{
 			feature.add(p);
 			noticablePixelsQueue.remove(p);
 
-			preorderTraversal(p.getRight());
-			preorderTraversal(p.getTop());
-			preorderTraversal(p.getLeft());
-			preorderTraversal(p.getBottom());
+			preorderTraversal(p.getRightNeighborPixel());
+			preorderTraversal(p.getTopNeighborPixel());
+			preorderTraversal(p.getLeftNeighborPixel());
+			preorderTraversal(p.getBottomNeighborPixel());
 
 		}				
 	}

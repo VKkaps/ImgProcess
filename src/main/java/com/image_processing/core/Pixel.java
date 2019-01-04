@@ -1,7 +1,11 @@
 package com.image_processing.core;
 
+/*Class for an individual pixel in a digital image*/
+
+
 public class Pixel {
 
+	/*8 bit color values (0 - 255) for this Pixel*/
 	private int rVal;
 	private int gVal;
 	private int bVal;
@@ -11,8 +15,8 @@ public class Pixel {
 	private final int xCoor;
 	private final int yCoor;	
 		
-	private boolean isNoticable;
-	private boolean isSurronded;
+	private boolean isNoticable=false;
+	private boolean isSurronded=false;
 	
 	
 	private Pixel left = null;
@@ -21,37 +25,34 @@ public class Pixel {
 	private Pixel bottom = null;
 	
 
-	//Constructor with individual ints
+	//Constructor with individual color ints, and x,y coordinates
  	public Pixel(int r, int g, int b, int X, int Y){
 		rVal = r;
 		gVal = g;
 		bVal = b;
 		xCoor=X;
 		yCoor=Y;
-		isNoticable=false;
-		isSurronded=false;
 		setrgbAverage();
 	}
 	
 
-	//Constructor with an int array
+	//Constructor with an int array, and x,y coordinates
 	public Pixel(int[] pix, int X, int Y){
 		rVal = pix[0];
 		gVal = pix[1];
 		bVal = pix[2];
 		xCoor=X;
 		yCoor=Y;
-		isNoticable=false;
-		isSurronded=false;
 		setrgbAverage();
 	}
 	
 	
+	// Find the average RGB value of the pixel
 	private void setrgbAverage() { 
 		pixelRGBAverage = (rVal + gVal + bVal) / 3;		
 	}
 
-	
+	// Console print Pixel information.  For troubleshooting purposes.
 	public void printPixelRGB(){
 		System.out.println("[" + xCoor + "," + yCoor + "], " + "(R" + rVal + ", G" + gVal + ", B" + bVal + ") "
 				+ "rgb Ave: " + pixelRGBAverage);
@@ -78,42 +79,42 @@ public class Pixel {
 		this.isNoticable = isNoticable;
 	}	
 	
-	public Pixel getLeft() {
+	public Pixel getLeftNeighborPixel() {
 		return left;
 	}
 
 
-	public void setLeft(Pixel left) {
+	public void setLeftNeighborPixel(Pixel left) {
 		this.left = left;
 	}
 
 
-	public Pixel getRight() {
+	public Pixel getRightNeighborPixel() {
 		return right;
 	}
 
 
-	public void setRight(Pixel right) {
+	public void setRightNeighborPixel(Pixel right) {
 		this.right = right;
 	}
 
 
-	public Pixel getTop() {
+	public Pixel getTopNeighborPixel() {
 		return top;
 	}
 
 
-	public void setTop(Pixel top) {
+	public void setTopNeighborPixel(Pixel top) {
 		this.top = top;
 	}
 
 
-	public Pixel getBottom() {
+	public Pixel getBottomNeighborPixel() {
 		return bottom;
 	}
 
 
-	public void setBottom(Pixel bottom) {
+	public void setBottomNeighborPixel(Pixel bottom) {
 		this.bottom = bottom;
 	}
 
@@ -164,8 +165,13 @@ public class Pixel {
 
 	public void setIsSurronded(boolean isSurronded) {
 		
-		if (this.left!=null && this.right!=null && this.top!=null && this.bottom != null) isSurronded = true;
-		else isSurronded = false;
+		if (this.left!=null && this.right!=null && this.top!=null && this.bottom != null) this.isSurronded = true;
+		else this.isSurronded = false;
+	}
+	
+	public boolean isEdgePixel() {
+		if (isSurronded) return false;
+		else return true;
 	}
 
 }

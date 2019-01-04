@@ -34,7 +34,7 @@ public abstract class AbstractProcessImage {
 
 	
 	/*
-	 * Initialize object field 'imagePixelArray', which is a 2-D array of type 'Pixel'
+	 * Initialize class field 'imagePixelArray', which is a 2-D array of type 'Pixel'
 	 * */	
 	private void initImagePixelArray() {
 		for (int y = 0; y < imageHeight; y++) {

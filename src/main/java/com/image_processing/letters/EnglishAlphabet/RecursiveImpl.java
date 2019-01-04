@@ -1,4 +1,4 @@
-package main.java.com.image_processing.letters.EnglishAlphabet;
+package com.image_processing.letters.EnglishAlphabet;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import main.java.com.image_processing.core.Feature;
-import main.java.com.image_processing.core.Pixel;
+import com.image_processing.core.Feature;
+import com.image_processing.core.Pixel;
 
 public class RecursiveImpl extends AbstractProcessImage{
 	
@@ -31,7 +31,7 @@ public class RecursiveImpl extends AbstractProcessImage{
 	
 
 
-	/* For each pixel, check if neighbor pixels (left, right , top, and bottom) are noticable
+	/* For each noticable pixel (determined in parent class), check if neighbor pixels (left, right , top, and bottom) are noticable
 	 *  or not.  If so, initialize this noticable neighbor pixel in the current pixel.
 	 */
 	
@@ -45,6 +45,7 @@ public class RecursiveImpl extends AbstractProcessImage{
 		
 			
 		for (Pixel p : noticablePixList) {
+			
 			leftX = p.getXcoor()-1;
 			rightX = p.getXcoor()+1;
 			topY = p.getYcoor()-1;
@@ -52,33 +53,19 @@ public class RecursiveImpl extends AbstractProcessImage{
 			
 			
 			if (imagePixelArray[leftX][p.getYcoor()].isNoticable()) {
-				p.setLeft(imagePixelArray[leftX][p.getYcoor()]);
+				p.setLeftNeighborPixel(imagePixelArray[leftX][p.getYcoor()]);
 			}
 			if (imagePixelArray[rightX][p.getYcoor()].isNoticable()) {
-				p.setRight(imagePixelArray[rightX][p.getYcoor()]);
+				p.setRightNeighborPixel(imagePixelArray[rightX][p.getYcoor()]);
 			}
 			if (imagePixelArray[p.getXcoor()][topY].isNoticable()) {
-				p.setTop(imagePixelArray[p.getXcoor()][topY]);
+				p.setTopNeighborPixel(imagePixelArray[p.getXcoor()][topY]);
 			}
 			if (imagePixelArray[p.getXcoor()][bottomY].isNoticable()) {
-				p.setBottom(imagePixelArray[p.getXcoor()][bottomY]);
+				p.setBottomNeighborPixel(imagePixelArray[p.getXcoor()][bottomY]);
 			}
 			
 			
-			if (imagePixelArray[leftX][topY].isNoticable()) {
-				p.setNoticableLT(imagePixelArray[leftX][topY]);
-			}
-			if (imagePixelArray[rightX][topY].isNoticable()) {
-				p.setNoticableRT(imagePixelArray[rightX][topY]);
-			}
-			if (imagePixelArray[leftX][bottomY].isNoticable()) {
-				p.setNoticableLB(imagePixelArray[leftX][bottomY]);
-			}
-			if (imagePixelArray[rightX][bottomY].isNoticable()) {
-				p.setNoticableRB(imagePixelArray[rightX][bottomY]);
-			}
-			
-			p.determineEdgePixel();
 			if (p.isEdgePixel()) {
 				filteredPixList.add(p);
 			}
@@ -134,10 +121,10 @@ public class RecursiveImpl extends AbstractProcessImage{
 				feature.add(p);
 				noticablePixelsQueue.remove(p);
 
-					preorderTraversal(p.getRight());
-					preorderTraversal(p.getTop());
-					preorderTraversal(p.getLeft());
-					preorderTraversal(p.getBottom());
+					preorderTraversal(p.getRightNeighborPixel());
+					preorderTraversal(p.getTopNeighborPixel());
+					preorderTraversal(p.getLeftNeighborPixel());
+					preorderTraversal(p.getBottomNeighborPixel());
 			}
 	}
 
@@ -152,7 +139,7 @@ public class RecursiveImpl extends AbstractProcessImage{
 		System.out.println("Number of Features: " + mapFeatures.size());
 
 		for (Feature f : mapFeatures.values()) {
-			if (f.isExternal()) drawNeonBox(rawImage, f.getBoundaryArr());
+			drawNeonBox(rawImage, f.getBoundaryArr());
 		}	
 		return rawImage;
 	}
