@@ -1,6 +1,7 @@
 package com.image_processing.letters.EnglishAlphabet;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,26 +10,57 @@ import java.util.Queue;
 
 import com.image_processing.core.Feature;
 import com.image_processing.core.Pixel;
+import com.image_processing.core.api.AbstractProcessImage;
 
 public class RecursiveImpl extends AbstractProcessImage{
 	
 	
 	private Map<Integer, Feature> mapFeatures = new HashMap<Integer, Feature>();
-	private List<Pixel> feature = new LinkedList<Pixel>();
+	private List<Pixel> feature = new ArrayList<Pixel>();
 	private int mapPointer;
 	private Queue<Pixel> noticablePixelsQueue;
 		
-	private List<Pixel> filteredPixList = new LinkedList<>();
+	private List<Pixel> filteredPixList = new ArrayList<>();
 	
 	
 
 	public RecursiveImpl(BufferedImage b) {
 		super(b);
+		findNoticablePixels();
 		initializeNeighborPixels();
 		findFeatures();
+		//identifyLetters(f);
 	}
 	
 	
+	/*
+	 * Initializes the field 'noticablePixList'.  A pixel is determined to be noticable if 
+	 * it's average RGB value is less than (averageRGBPixelvalue - x), where x is a
+	 * arbitrary int value.
+	 * 
+	 * Note, for loop values are offset (1 instead of 0) to prevent ArrayOutOfBounds errors.
+	 * 
+	 * */
+	
+	protected void findNoticablePixels() {
+		final long startTime = System.currentTimeMillis();
+		
+		for (int y = 1; y < imageHeight-1; y++) {
+		    for (int x = 1; x < imageWidth-1; x++) {
+		    	/*For each Pixel in image, determine if it is noticable by passing in the
+		    	 * Image averageRGBPixelvalue.
+		    	 * 
+		    	 * If it is noticable add it to the noticablePix list
+		    	 * */
+		    	imagePixelArray[x][y].initializeIsNoticable(averageRGBPixelvalue);
+		    	if (imagePixelArray[x][y].isNoticable()) noticablePixList.add(imagePixelArray[x][y]);
+		    }
+		}
+		
+        final long endTime = System.currentTimeMillis();
+
+        System.out.println("\nfindNoticablePixels execution time: " + (endTime - startTime) + " ms");      
+	}
 
 
 	/* For each pixel, check if neighbor pixels (left, right , top, and bottom) are noticable
@@ -43,7 +75,6 @@ public class RecursiveImpl extends AbstractProcessImage{
 		int topY;
 		int bottomY;
 		
-			
 		for (Pixel p : noticablePixList) {
 			leftX = p.getXcoor()-1;
 			rightX = p.getXcoor()+1;
@@ -94,14 +125,12 @@ public class RecursiveImpl extends AbstractProcessImage{
 
 	}
 
-	
-	
-	
+
 	
 	@Override
 	protected void findFeatures() {
 		noticablePixelsQueue = new LinkedList<Pixel>(noticablePixList);
-
+		System.out.println("Number of noticable pixels: " + noticablePixelsQueue.size());
         final long startTimeOut = System.currentTimeMillis();
 		try {
 			while (!noticablePixelsQueue.isEmpty()) {
@@ -109,10 +138,10 @@ public class RecursiveImpl extends AbstractProcessImage{
 		       
 				if (feature.size()>10) mapFeatures.put(mapPointer, new Feature(feature));
 				mapPointer++;
-				feature = new LinkedList<Pixel>();
+				feature = new ArrayList<Pixel>();
 			}
 		} catch (StackOverflowError e) {
-			System.out.println("\nStack overflow error!! -vfk: " + e.getLocalizedMessage());
+			System.out.println("\nStack overflow error!! -vfk: " + e.getMessage());
 			//System.exit(1);
 		}
         final long endTimeOut = System.currentTimeMillis();
@@ -155,6 +184,14 @@ public class RecursiveImpl extends AbstractProcessImage{
 		}	
 		return rawImage;
 	}
+	
+//	public Letter identifyLetters(Feature f) {
+//		// a feature is a array list of pixels
+//		
+//		Letter l = new Letter(f.getFeaturePixelsAs2DArray());
+//		
+//		return l;
+//	}
 	
 }
 

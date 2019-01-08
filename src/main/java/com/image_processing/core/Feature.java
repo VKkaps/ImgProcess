@@ -4,8 +4,8 @@ import java.util.List;
 
 public class Feature {
 
-	private List<Pixel> featureGroup;
-	private int[] boundaryArr = new int[4];
+	private List<Pixel> featureGroup;  //List of Pixels in a Feature
+	private int[] boundaryArr = new int[4];  //4 outer most points around the Feature (for Drawing purposes)
 	private Pixel topMostPix;
 	
 	public Feature(List<Pixel> group) {
@@ -60,6 +60,12 @@ public class Feature {
 //		}
 		
 		 return true;	
+	}
+	
+	
+	public Pixel[][] getFeaturePixelsAs2DArray() {
+		return (Pixel[][]) featureGroup.toArray();
+		
 	}
 	
 }

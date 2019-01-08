@@ -35,6 +35,7 @@ public class ProcessImageServlet extends HttpServlet {
         InputStream fileContent = filePart.getInputStream();
         BufferedImage imBuff = ImageIO.read(fileContent);
 
+        // Choose implementation here
         RecursiveImpl r = new RecursiveImpl(imBuff);
 
         

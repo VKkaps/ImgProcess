@@ -70,9 +70,13 @@ public class Pixel {
 		return rgb;
 	}
 	
-	/*Every user selected image is going to have a slightly different RGB average*/
+	/*Every user selected image is going to have a slightly different RGB average.
+	 * If the current Pixel RGB is 30 levels less than the average Image RGB value or
+	 * if it is less than 30 levels total, it is considered 'noticable'.
+	 * 
+	 * */
 	public void initializeIsNoticable(int imageAverageRGBvalue) {
-		if (pixelRGBAverage < imageAverageRGBvalue-25) setIsNoticable(true);
+		if (pixelRGBAverage < imageAverageRGBvalue-30 || pixelRGBAverage < 30) setIsNoticable(true);
 		else setIsNoticable(false);		
 	}
 	
