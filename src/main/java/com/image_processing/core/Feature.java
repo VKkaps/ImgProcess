@@ -1,16 +1,35 @@
 package com.image_processing.core;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class Feature {
 
 	private List<Pixel> featureGroup;  //List of Pixels in a Feature
 	private int[] boundaryArr = new int[4];  //4 outer most points around the Feature (for Drawing purposes)
-	private Pixel topMostPix;
+	BufferedImage featureImage = null;
+	
 	
 	public Feature(List<Pixel> group) {
 		featureGroup = group;
 		findBoundary();
+	}
+	
+	public Feature(List<Pixel> group, BufferedImage rawImage) {
+		featureGroup = group;
+		findBoundary();
+		saveFeature(rawImage);
+	}
+
+	
+	
+	/*Export Feature as a jpg image to an absolute path directory*/
+	private void saveFeature(BufferedImage rawImage) {
+		featureImage = rawImage.getSubimage(boundaryArr[0], boundaryArr[1], (boundaryArr[2] - boundaryArr[0]), (boundaryArr[3] - boundaryArr[1]));
+		AbstractProcessImage.outputFile(featureImage, "C:/sample_images/Features/", "feature "
+				+ boundaryArr[0] + ", " + boundaryArr[1], "jpg");
+		System.out.println("Feature images saved to C:/sample_images/Features/");
+		
 	}
 
 	private void findBoundary() {
@@ -21,21 +40,15 @@ public class Feature {
 		int lastX = featureGroup.get(0).getXcoor();
 		int lastY = featureGroup.get(0).getYcoor();
 		
-		int i=0;
-		int hold=0;
 		for (Pixel p : featureGroup) {
 			if (p.getXcoor() < firstX) firstX = p.getXcoor();
 			if (p.getYcoor() < firstY) {
 				firstY = p.getYcoor();
-				hold=i;
 			}
 			if (p.getXcoor() > lastX) lastX = p.getXcoor();
 			if (p.getYcoor() > lastY) lastY = p.getYcoor();
-			i++;
 		}
 		
-		topMostPix = featureGroup.get(hold);
-		//topMostPix.printPixelRGB();
 
 		boundaryArr[0] = firstX;
 		boundaryArr[1] = firstY;
@@ -51,22 +64,14 @@ public class Feature {
 	public int[] getBoundaryArr() {
 		return boundaryArr;
 	}
-	
-	
-	public boolean isExternal() {
-
-//		if (topMostPix.getBottom()==null || topMostPix.getRight()==null || topMostPix.getNoticableRB()==null) {
-//			return false;
-//		}
 		
-		 return true;	
-	}
-	
-	
 	public Pixel[][] getFeaturePixelsAs2DArray() {
 		return (Pixel[][]) featureGroup.toArray();
 		
 	}
+	
+	
+	
 	
 }
 

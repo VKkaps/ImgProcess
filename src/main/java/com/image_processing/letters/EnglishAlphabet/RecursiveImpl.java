@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import com.image_processing.core.AbstractProcessImage;
 import com.image_processing.core.Feature;
 import com.image_processing.core.Pixel;
-import com.image_processing.core.api.AbstractProcessImage;
 
 public class RecursiveImpl extends AbstractProcessImage{
 	
@@ -76,6 +76,7 @@ public class RecursiveImpl extends AbstractProcessImage{
 		int bottomY;
 		
 		for (Pixel p : noticablePixList) {
+			
 			leftX = p.getXcoor()-1;
 			rightX = p.getXcoor()+1;
 			topY = p.getYcoor()-1;
@@ -130,13 +131,13 @@ public class RecursiveImpl extends AbstractProcessImage{
 	@Override
 	protected void findFeatures() {
 		noticablePixelsQueue = new LinkedList<Pixel>(noticablePixList);
-		System.out.println("Number of noticable pixels: " + noticablePixelsQueue.size());
+		System.out.println("Number of noticable pixels: " + noticablePixelsQueue.size() + " pixels");
         final long startTimeOut = System.currentTimeMillis();
 		try {
 			while (!noticablePixelsQueue.isEmpty()) {
 				preorderTraversal(noticablePixelsQueue.remove());
-		       
-				if (feature.size()>10) mapFeatures.put(mapPointer, new Feature(feature));
+				
+				if (feature.size()>10) mapFeatures.put(mapPointer, new Feature(feature)); //, rawImage
 				mapPointer++;
 				feature = new ArrayList<Pixel>();
 			}
@@ -146,6 +147,7 @@ public class RecursiveImpl extends AbstractProcessImage{
 		}
         final long endTimeOut = System.currentTimeMillis();
 
+        System.out.println("Number of Features: " + mapFeatures.size() + " features");
         System.out.println("findFeatures execution time: " + (endTimeOut - startTimeOut) + " ms");		
 	}
 	
@@ -159,7 +161,7 @@ public class RecursiveImpl extends AbstractProcessImage{
 	
 	private void preorderTraversal(Pixel p) {
 
-			if(p !=  null && !feature.contains(p) && p.isEdgePixel()) {
+			if(p !=  null && !feature.contains(p)) {  
 				feature.add(p);
 				noticablePixelsQueue.remove(p);
 
@@ -180,19 +182,11 @@ public class RecursiveImpl extends AbstractProcessImage{
 	public BufferedImage boxFeatures() {
 
 		for (Feature f : mapFeatures.values()) {
-			if (f.isExternal()) drawNeonBox(rawImage, f.getBoundaryArr());
+			drawNeonBox(rawImage, f.getBoundaryArr());
 		}	
 		return rawImage;
 	}
-	
-//	public Letter identifyLetters(Feature f) {
-//		// a feature is a array list of pixels
-//		
-//		Letter l = new Letter(f.getFeaturePixelsAs2DArray());
-//		
-//		return l;
-//	}
-	
+		
 }
 
 
