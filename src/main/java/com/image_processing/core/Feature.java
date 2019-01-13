@@ -6,8 +6,8 @@ import java.util.List;
 public class Feature {
 
 	private List<Pixel> featureGroup;  //List of Pixels in a Feature
-	private int[] boundaryArr = new int[4];  //4 outer most points around the Feature (for Drawing purposes)
-	BufferedImage featureImage = null;
+	private int[] boundaryArr = new int[4];  //4 outer most points around the Feature (for Boxing purposes)
+	BufferedImage featureImage = null;  //Used to save Feature jpg image to a absolute file location
 	
 	
 	public Feature(List<Pixel> group) {
@@ -22,8 +22,7 @@ public class Feature {
 	}
 
 	
-	
-	/*Export Feature as a jpg image to an absolute path directory*/
+	/*Optional:  Export Feature as a jpg image to an absolute path directory*/
 	private void saveFeature(BufferedImage rawImage) {
 		featureImage = rawImage.getSubimage(boundaryArr[0], boundaryArr[1], (boundaryArr[2] - boundaryArr[0]), (boundaryArr[3] - boundaryArr[1]));
 		AbstractProcessImage.outputFile(featureImage, "C:/sample_images/Features/", "feature "
@@ -56,6 +55,7 @@ public class Feature {
 		boundaryArr[3] = lastY;
 	
 	}
+
 	
 	public List<Pixel> getFeatureGroup() {
 		return featureGroup;
@@ -69,9 +69,6 @@ public class Feature {
 		return (Pixel[][]) featureGroup.toArray();
 		
 	}
-	
-	
-	
 	
 }
 

@@ -24,6 +24,7 @@ public abstract class AbstractProcessImage {
 	private final Color neon = new Color(58, 255, 20);	
 	
 	
+	//JPG only for BufferedImage!!
 	public AbstractProcessImage(BufferedImage b) {
 		rawImage = b;
 		imageWidth = rawImage.getWidth();

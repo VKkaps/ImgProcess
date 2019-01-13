@@ -18,10 +18,14 @@ public class RecursiveImpl extends AbstractProcessImage{
 	private Map<Integer, Feature> mapFeatures = new HashMap<Integer, Feature>();
 	private List<Pixel> feature = new ArrayList<Pixel>();
 	private int mapPointer;
-	private Queue<Pixel> noticablePixelsQueue;
+	private Queue<Pixel> noticableEdgePixelsQueue;
 		
 	private List<Pixel> filteredPixList = new ArrayList<>();
 	
+	
+	private int findTime;
+	private int initTime;
+	private int findFeaturesTime;
 	
 
 	public RecursiveImpl(BufferedImage b) {
@@ -47,17 +51,20 @@ public class RecursiveImpl extends AbstractProcessImage{
 		
 		for (int y = 1; y < imageHeight-1; y++) {
 		    for (int x = 1; x < imageWidth-1; x++) {
-		    	/*For each Pixel in image, determine if it is noticable by passing in the
-		    	 * Image averageRGBPixelvalue.
+		    	
+		    	/*For each Pixel in image, determine if it is noticable by passing in 
+		    	 * the Image averageRGBPixelvalue.
 		    	 * 
-		    	 * If it is noticable add it to the noticablePix list
+		    	 * If it is noticable, add it to the noticablePix list.
 		    	 * */
+		    	
 		    	imagePixelArray[x][y].initializeIsNoticable(averageRGBPixelvalue);
 		    	if (imagePixelArray[x][y].isNoticable()) noticablePixList.add(imagePixelArray[x][y]);
 		    }
 		}
 		
         final long endTime = System.currentTimeMillis();
+        findTime = Math.toIntExact(endTime - startTime);
 
         System.out.println("\nfindNoticablePixels execution time: " + (endTime - startTime) + " ms");      
 	}
@@ -110,8 +117,8 @@ public class RecursiveImpl extends AbstractProcessImage{
 				p.setNoticableRB(imagePixelArray[rightX][bottomY]);
 			}
 			
-			p.determineEdgePixel();
-			if (p.isEdgePixel()) {
+			
+			if (p.determineIfEdgePixel()) {
 				filteredPixList.add(p);
 			}
 
@@ -120,8 +127,9 @@ public class RecursiveImpl extends AbstractProcessImage{
 		noticablePixList = filteredPixList;
 		
         final long endTime = System.currentTimeMillis();
+        initTime = Math.toIntExact(endTime - startTime);
 
-        System.out.println("initializeNeighborPixels execution time: " + (endTime - startTime) + " ms");
+        System.out.println("initializeNeighborPixels execution time: " + initTime + " ms");
         
 
 	}
@@ -130,12 +138,12 @@ public class RecursiveImpl extends AbstractProcessImage{
 	
 	@Override
 	protected void findFeatures() {
-		noticablePixelsQueue = new LinkedList<Pixel>(noticablePixList);
-		System.out.println("Number of noticable pixels: " + noticablePixelsQueue.size() + " pixels");
+		noticableEdgePixelsQueue = new LinkedList<Pixel>(noticablePixList);
+		System.out.println("Number of noticable pixels: " + noticableEdgePixelsQueue.size() + " pixels");
         final long startTimeOut = System.currentTimeMillis();
 		try {
-			while (!noticablePixelsQueue.isEmpty()) {
-				preorderTraversal(noticablePixelsQueue.remove());
+			while (!noticableEdgePixelsQueue.isEmpty()) {
+				preorderTraversal(noticableEdgePixelsQueue.remove());
 				
 				if (feature.size()>10) mapFeatures.put(mapPointer, new Feature(feature)); //, rawImage
 				mapPointer++;
@@ -146,9 +154,9 @@ public class RecursiveImpl extends AbstractProcessImage{
 			//System.exit(1);
 		}
         final long endTimeOut = System.currentTimeMillis();
-
+        findFeaturesTime = Math.toIntExact(endTimeOut - startTimeOut);
         System.out.println("Number of Features: " + mapFeatures.size() + " features");
-        System.out.println("findFeatures execution time: " + (endTimeOut - startTimeOut) + " ms");		
+        System.out.println("findFeatures execution time: " + findFeaturesTime + " ms");		
 	}
 	
 	
@@ -163,7 +171,7 @@ public class RecursiveImpl extends AbstractProcessImage{
 
 			if(p !=  null && !feature.contains(p)) {  
 				feature.add(p);
-				noticablePixelsQueue.remove(p);
+				noticableEdgePixelsQueue.remove(p);
 
 					preorderTraversal(p.getRight());
 					preorderTraversal(p.getTop());
@@ -185,6 +193,29 @@ public class RecursiveImpl extends AbstractProcessImage{
 			drawNeonBox(rawImage, f.getBoundaryArr());
 		}	
 		return rawImage;
+	}
+	
+	
+	
+	
+	public int getFindTime() {
+		return findTime;
+	}
+	
+	public int getInitTime() {
+		return initTime;
+	}
+	
+	public int getFindFeaturesTime() {
+		return findFeaturesTime;
+	}
+	
+	public int getPixels() {
+		return filteredPixList.size();
+	}
+	
+	public int getFeatures() {
+		return mapFeatures.size();
 	}
 		
 }

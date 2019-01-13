@@ -11,64 +11,49 @@ public class Pixel {
 	
 	private int pixelRGBAverage;
 	
+	//Coordinates of Pixel in user-provided Image
 	private final int xCoor;
 	private final int yCoor;	
 		
+	//Important Pixel attributes
 	private boolean isNoticable=false;
 	private boolean isEdgePixel=false;
 	
+	
+	//Left, Right, Top, Bottom Neighbor Pixels
 	private Pixel noticableLeft = null;
 	private Pixel noticableRight = null;
 	private Pixel noticableTop = null;
 	private Pixel noticableBottom = null;
 	
-
+	//Corner Neighbor Pixels
 	private Pixel noticableLT = null;
 	private Pixel noticableRT = null;
 	private Pixel noticableLB = null;
 	private Pixel noticableRB = null;
 	
 
-	//Constructor with individual RGB ints
- 	public Pixel(int r, int g, int b, int X, int Y){
-		rVal = r;
-		gVal = g;
-		bVal = b;
-		xCoor=X;
-		yCoor=Y;
-		setrgbAverage();
-	}	
-
-	//Constructor with an RGB int array
+	//Constructor with an RGB int array and coordinates
 	public Pixel(int[] pix, int X, int Y){
 		rVal = pix[0];
 		gVal = pix[1];
 		bVal = pix[2];
 		xCoor=X;
 		yCoor=Y;
-		setrgbAverage();
+		pixelRGBAverage = (rVal + gVal + bVal) / 3;	
 	}
 	
 	
 ////////////////////////Methods///////////////////////////////
 	
-	// Find the average RGB value of the pixel
-	private void setrgbAverage() { 
-		pixelRGBAverage = (rVal + gVal + bVal) / 3;		
-	}
-
 	
-	// Console print Pixel information.  For troubleshooting purposes.
+	// Print Pixel information to console.  For troubleshooting purposes.
 	public void printPixelRGB(){
 		System.out.println("[" + xCoor + "," + yCoor + "], " + "(R" + rVal + ", G" + gVal + ", B" + bVal + ") "
 				+ "rgb Ave: " + pixelRGBAverage);
 		
 	}
 	
-	public int[] getPixelRGBArray() {
-		int[] rgb = {rVal, gVal, bVal};
-		return rgb;
-	}
 	
 	/*Every user selected image is going to have a slightly different RGB average.
 	 * If the current Pixel RGB is 30 levels less than the average Image RGB value or
@@ -76,18 +61,31 @@ public class Pixel {
 	 * 
 	 * */
 	public void initializeIsNoticable(int imageAverageRGBvalue) {
-		if (pixelRGBAverage < imageAverageRGBvalue-30 || pixelRGBAverage < 30) setIsNoticable(true);
-		else setIsNoticable(false);		
+		if (pixelRGBAverage < imageAverageRGBvalue-30 || pixelRGBAverage < 30) isNoticable = true;
+		else isNoticable = false;		
 	}
 	
+	/* This method is called externally after initializeNeighborPixels method has run.
+	 * The purpose is to check all neighbor pixels for a particular pixel, to see if the
+	 * particular pixel is an edge or not.
+	 * 
+	 * */
+	public boolean determineIfEdgePixel() {
+		if (noticableLeft==null || noticableRight==null || noticableTop==null || noticableBottom==null 
+				|| noticableLT==null || noticableRT==null || noticableLB==null || noticableRB==null) {
+			isEdgePixel = true;
+		}
+		else isEdgePixel = false;
+		
+		return isEdgePixel;
+	}
+	
+	
+///////////////////////////SETTERS&GETTERS///////////////////////////////////
 	
 	public boolean isNoticable() {
 		return isNoticable;
 	}
-
-	public void setIsNoticable(boolean isNoticable) {
-		this.isNoticable = isNoticable;
-	}	
 	
 	public Pixel getLeft() {
 		return noticableLeft;
@@ -197,14 +195,6 @@ public class Pixel {
 	
 	public int getrgbAverage() {
 		return pixelRGBAverage;
-	}
-	
-	public void determineEdgePixel() {
-		if (noticableLeft==null || noticableRight==null || noticableTop==null || noticableBottom==null 
-				|| noticableLT==null || noticableRT==null || noticableLB==null || noticableRB==null) {
-			isEdgePixel = true;
-		}
-		else isEdgePixel = false;
 	}
 	
 	public boolean isEdgePixel() {
