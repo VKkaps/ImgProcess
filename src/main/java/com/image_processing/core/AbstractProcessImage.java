@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -33,8 +34,8 @@ public abstract class AbstractProcessImage {
 		initImagePixelArray();  // Load Pixels into above array
 		findAverageRGBPixelValueForImage();
 	}
-
 	
+
 	/*
 	 * Create a new 'Pixel' object for every pixel in user provided image
 	 * */	
@@ -64,6 +65,23 @@ public abstract class AbstractProcessImage {
 	}
 		
 	
+	
+	/*
+	 * Draw a Neon box around each Feature.
+	 * getBoundaryArr returns an int Array from the Feature of lowest/highest X and Y pixels
+	 * */
+	
+	public BufferedImage boxFeatures(BufferedImage rawImage, Map<Integer, Feature> mapFeatures) {
+		g2d = rawImage.createGraphics();
+		g2d.setColor(neon);
+		
+		for (Feature f : mapFeatures.values()) {
+			drawNeonBox(rawImage, f.getBoundaryArr());
+		}	
+		return rawImage;
+	}
+	
+	
 	/*
 	 * 
 	 *	fourCoordinatesArr[0] = firstX;
@@ -74,15 +92,13 @@ public abstract class AbstractProcessImage {
 	 * */
 	
 	public void drawNeonBox(BufferedImage b, int[] fourCoordinates) {
-		g2d = b.createGraphics();
-		g2d.setColor(neon);
 		g2d.drawLine(fourCoordinates[0]-1, fourCoordinates[1]-1, fourCoordinates[2]+1, fourCoordinates[1]-1);
 		g2d.drawLine(fourCoordinates[0]-1, fourCoordinates[3]+1, fourCoordinates[2]+1, fourCoordinates[3]+1);
 		g2d.drawLine(fourCoordinates[0]-1, fourCoordinates[1]-1, fourCoordinates[0]-1, fourCoordinates[3]+1);
 		g2d.drawLine(fourCoordinates[2]+1, fourCoordinates[1]-1, fourCoordinates[2]+1, fourCoordinates[3]+1);
 
 	}
-	
+		
 	
 	public static void outputFile(BufferedImage b, String filePath, String imageName, String imageType) {
 		File outputFile = new File(filePath + imageName + "." + imageType);

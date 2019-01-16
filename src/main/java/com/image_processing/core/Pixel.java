@@ -2,7 +2,7 @@ package com.image_processing.core;
 
 /*Class for an individual pixel in a digital image*/
 
-public class Pixel {
+public class Pixel implements Comparable<Pixel>{
 
 	/*8 bit color values (0 - 255) for this Pixel*/
 	private int rVal;
@@ -78,6 +78,12 @@ public class Pixel {
 		else isEdgePixel = false;
 		
 		return isEdgePixel;
+	}
+	
+
+	@Override
+	public int compareTo(Pixel p) {
+		return (this.getXcoor() - p.getXcoor());
 	}
 	
 	

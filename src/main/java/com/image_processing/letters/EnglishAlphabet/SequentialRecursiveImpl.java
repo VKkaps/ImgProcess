@@ -2,6 +2,7 @@ package com.image_processing.letters.EnglishAlphabet;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,28 +13,25 @@ import com.image_processing.core.AbstractProcessImage;
 import com.image_processing.core.Feature;
 import com.image_processing.core.Pixel;
 
-public class RecursiveImpl extends AbstractProcessImage{
+public class SequentialRecursiveImpl extends AbstractProcessImage{
 	
-	
+	private List<Pixel> feature = new ArrayList<Pixel>();	
 	private Map<Integer, Feature> mapFeatures = new HashMap<Integer, Feature>();
-	private List<Pixel> feature = new ArrayList<Pixel>();
 	private int mapPointer;
 	private Queue<Pixel> noticableEdgePixelsQueue;
-		
-	private List<Pixel> filteredPixList = new ArrayList<>();
-	
+	private List<Pixel> filteredPixList = new ArrayList<>();	
 	
 	private int findTime;
 	private int initTime;
 	private int findFeaturesTime;
 	
 
-	public RecursiveImpl(BufferedImage b) {
+	public SequentialRecursiveImpl(BufferedImage b) {
 		super(b);
 		findNoticablePixels();
 		initializeNeighborPixels();
 		findFeatures();
-		//identifyLetters(f);
+		boxFeatures(b, mapFeatures);
 	}
 	
 	
@@ -123,8 +121,19 @@ public class RecursiveImpl extends AbstractProcessImage{
 			}
 
 		}
-				
+		
+		
+		Collections.sort(filteredPixList);
+		
+		System.out.println("before: " + noticablePixList.size());
+		
 		noticablePixList = filteredPixList;
+
+		System.out.println("after:" + noticablePixList.size());
+		
+		noticableEdgePixelsQueue = new LinkedList<Pixel>(noticablePixList);
+		
+		System.out.println("afterq: " + noticableEdgePixelsQueue.size());
 		
         final long endTime = System.currentTimeMillis();
         initTime = Math.toIntExact(endTime - startTime);
@@ -134,11 +143,18 @@ public class RecursiveImpl extends AbstractProcessImage{
 
 	}
 
-
 	
+		
+	
+
+
+	/*
+	 * Take a queue of noticable edge pixels and traverse thru them grouping
+	 * them into features using a recursive method "preorderTraversal".
+	 * 
+	 * */
 	@Override
 	protected void findFeatures() {
-		noticableEdgePixelsQueue = new LinkedList<Pixel>(noticablePixList);
 		System.out.println("Number of noticable pixels: " + noticableEdgePixelsQueue.size() + " pixels");
         final long startTimeOut = System.currentTimeMillis();
 		try {
@@ -150,53 +166,45 @@ public class RecursiveImpl extends AbstractProcessImage{
 				feature = new ArrayList<Pixel>();
 			}
 		} catch (StackOverflowError e) {
-			System.out.println("\nStack overflow error!! -vfk: " + e.getMessage());
+			
+			System.out.println("\nStack overflow error!! -vfk: ");
+			
+			e.printStackTrace();
 			//System.exit(1);
 		}
         final long endTimeOut = System.currentTimeMillis();
         findFeaturesTime = Math.toIntExact(endTimeOut - startTimeOut);
         System.out.println("Number of Features: " + mapFeatures.size() + " features");
-        System.out.println("findFeatures execution time: " + findFeaturesTime + " ms");		
+        System.out.println("findFeatures execution time: " + findFeaturesTime + " ms");	
 	}
-	
 	
 	
 	/*
 	 * Recursive PreOrder Traversal of noticablePixels
-	 * If a noticable pixel has a neighboring noticable pixel add pixel to a growing pixel 
-	 * list, which is a Feature.
+	 * If a current noticable pixel has a neighboring noticable pixel add current 
+	 * noticable pixel to a growing pixel list, which is a Feature.  Then, go thru
+	 * Recursive process starting with the current noticable pixel's right neighbor
+	 * Pixel.
 	 */
 	
 	private void preorderTraversal(Pixel p) {
 
-			if(p !=  null && !feature.contains(p)) {  
-				feature.add(p);
-				noticableEdgePixelsQueue.remove(p);
+		if(p !=  null && !feature.contains(p) && p.isEdgePixel()) {  
+			feature.add(p);
+			noticableEdgePixelsQueue.remove(p);
 
-					preorderTraversal(p.getRight());
-					preorderTraversal(p.getTop());
-					preorderTraversal(p.getLeft());
-					preorderTraversal(p.getBottom());
-			}
+			preorderTraversal(p.getRight());
+			preorderTraversal(p.getBottom());
+			preorderTraversal(p.getTop());
+			preorderTraversal(p.getLeft());
+
+		}
 	}
 
 	
+		
 	
-	/*
-	 * Draw a Neon box around each Feature.
-	 * getBoundaryArr returns an int Array from the Feature of lowest/highest X and Y pixels
-	 * */
-	
-	public BufferedImage boxFeatures() {
-
-		for (Feature f : mapFeatures.values()) {
-			drawNeonBox(rawImage, f.getBoundaryArr());
-		}	
-		return rawImage;
-	}
-	
-	
-	
+	////////////GETTERS/////////////
 	
 	public int getFindTime() {
 		return findTime;
@@ -219,6 +227,9 @@ public class RecursiveImpl extends AbstractProcessImage{
 	}
 		
 }
+
+
+
 
 
 

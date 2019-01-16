@@ -1,13 +1,14 @@
 # Reference: https://github.com/github/gitignore
 # From: https://gist.github.com/edesdan/6bb43343740bcd54ef0f56a384a2f66f
 
-######################
-###### Mac OS X ######
-######################
 
 # Folder view configuration files
 .DS_Store
 Desktop.ini
+derbyDB/
+src/main/java/testing/
+timingDB/
+*.sql
 
 # Thumbnail cache files
 ._*
