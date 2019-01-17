@@ -10,7 +10,7 @@ Chrome webpage: http://localhost:8080/ImgProcess/
 
 Current timing results:
 
-![Timing pic](https://i.imgur.com/G5W63TR.png)
+![Timing pic](https://i.imgur.com/TIg1G6D.png)
 
 
 
