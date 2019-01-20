@@ -29,10 +29,10 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	private Map<Integer, Feature> mapFeatures3 = new HashMap<Integer, Feature>();
 	private Map<Integer, Feature> mapFeatures4 = new HashMap<Integer, Feature>();
 	
-	private int mapPointer1;
-	private int mapPointer2;
-	private int mapPointer3;
-	private int mapPointer4;
+	private List<Pixel> noticablePixList1 = new ArrayList<Pixel>();
+	private List<Pixel> noticablePixList2 = new ArrayList<Pixel>();
+	private List<Pixel> noticablePixList3 = new ArrayList<Pixel>();
+	private List<Pixel> noticablePixList4 = new ArrayList<Pixel>();
 	
 	//4 isolated edge Pixel Queues for Parallelism processing purposes
 	private Queue<Pixel> Core1noticableEdgePixelsQueue;
@@ -55,46 +55,8 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 		findNoticablePixels();
 		initializeNeighborPixels();
 		sortAndInitQueues();
-		executeQuadSearch();
-			
-		boxFeatures(b, mapFeatures1);
-		boxFeatures(b, mapFeatures2);
-		boxFeatures(b, mapFeatures3);
-		boxFeatures(b, mapFeatures4);
+		findFeatures();
 	}
-	
-	/*
-	 * Execute 4 findFeatures methods concurrently.  Main Thread is paused until
-	 * executeQuadSearch() completes.
-	 *  
-	 * findFeature methods have isolated resources, so no need for Synchronization.
-	 * 
-	 * */
-	private void executeQuadSearch() {
-		final long startTimeOut = System.currentTimeMillis();
-		
-		ExecutorService executorService = Executors.newFixedThreadPool(2);
-
-		Future<?> f1 = executorService.submit(this::findFeatures);
-		Future<?> f2 = executorService.submit(this::findFeatures2);
-		Future<?> f3 = executorService.submit(this::findFeatures3);
-		Future<?> f4 = executorService.submit(this::findFeatures4);
-		
-		try {
-			f1.get();
-			f2.get();
-			f3.get();
-			f4.get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
-
-		executorService.shutdown();
-		
-        final long endTimeOut = System.currentTimeMillis();
-        findFeaturesTime = Math.toIntExact(endTimeOut - startTimeOut);
-        System.out.println("findFeatures execution time: " + findFeaturesTime  + " ms");	
-		}
 	
 	
 	/*
@@ -109,27 +71,36 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	protected void findNoticablePixels() {
 		final long startTime = System.currentTimeMillis();
 		
-		for (int y = 1; y < imageHeight-1; y++) {
-		    for (int x = 1; x < imageWidth-1; x++) {
-		    	
-		    	/*For each Pixel in image, determine if it is noticable by passing in 
-		    	 * the Image averageRGBPixelvalue.
-		    	 * 
-		    	 * If it is noticable, add it to the noticablePix list.
-		    	 * */
-		    	
-		    	imagePixelArray[x][y].initializeIsNoticable(averageRGBPixelvalue);
-		    	if (imagePixelArray[x][y].isNoticable()) noticablePixList.add(imagePixelArray[x][y]);
-		    }
+		ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+		Future<?> f1 = executorService.submit(this::findNoticablePixels1);
+		Future<?> f2 = executorService.submit(this::findNoticablePixels2);
+		Future<?> f3 = executorService.submit(this::findNoticablePixels3);
+		Future<?> f4 = executorService.submit(this::findNoticablePixels4);
+		
+		try {
+			f1.get();
+			f2.get();
+			f3.get();
+			f4.get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
 		}
+
+		executorService.shutdown();
+		
+		noticablePixList.addAll(noticablePixList1);
+		noticablePixList.addAll(noticablePixList2);
+		noticablePixList.addAll(noticablePixList3);
+		noticablePixList.addAll(noticablePixList4);
 		
         final long endTime = System.currentTimeMillis();
         findTime = Math.toIntExact(endTime - startTime);
 
         System.out.println("\nfindNoticablePixels execution time: " + (endTime - startTime) + " ms");      
 	}
-
-
+	
+	
 	/* For each pixel, check if neighbor pixels (left, right , top, and bottom) are noticable
 	 *  or not.  If so, initialize this noticable neighbor pixel in the current pixel.
 	 */
@@ -190,6 +161,7 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
         System.out.println("initializeNeighborPixels execution time: " + initTime + " ms"); 
 	}
 	
+	
 	/*
 	 * Sort edgePixList, then split into 4 queues for processing
 	 * 
@@ -211,25 +183,140 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 		Core3noticableEdgePixelsQueue = new LinkedList<Pixel>(noticablePixList.subList(halfIndex+1, three_quarterIndex));
 		Core4noticableEdgePixelsQueue = new LinkedList<Pixel>(noticablePixList.subList((three_quarterIndex+1), noticablePixList.size()-1));
         
+//		for (Pixel p : Core1noticableEdgePixelsQueue) {
+//			p.printPixelRGB();
+//		}
+		
 		final long endTimeOut = System.currentTimeMillis();
         sortTime = Math.toIntExact(endTimeOut - startTimeOut);
         System.out.println("sortAndInitQueues execution time: " + sortTime  + " ms");	
+        System.out.println("Number of noticable edge pixels: " + noticablePixList.size() + " pixels");
 	}
 
+	
+	/*
+	 * Execute 4 findFeatures methods concurrently.  Main Thread is paused until
+	 * executeQuadSearch() completes.
+	 *  
+	 * findFeature methods have isolated resources, so no need for Synchronization.
+	 * 
+	 * */
+	@Override
+	protected void findFeatures() {
+		final long startTimeOut = System.currentTimeMillis();
+		
+		ExecutorService executorService = Executors.newFixedThreadPool(4);
 
+		Future<?> f1 = executorService.submit(this::findFeatures1);
+		Future<?> f2 = executorService.submit(this::findFeatures2);
+		Future<?> f3 = executorService.submit(this::findFeatures3);
+		Future<?> f4 = executorService.submit(this::findFeatures4);
+		
+		try {
+			f1.get();
+			f2.get();
+			f3.get();
+			f4.get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 
+		executorService.shutdown();
+		
+	    final long endTimeOut = System.currentTimeMillis();
+	    findFeaturesTime = Math.toIntExact(endTimeOut - startTimeOut);
+	    System.out.println("findFeatures execution time: " + findFeaturesTime  + " ms");	
+	}
+	
+
+	
+//////////CONCURRENT METHODS BELOW/////////////////
+	
+	
+	
+	protected void findNoticablePixels1() {
+
+		for (int y = 1; y < imageHeight_middle; y++) {
+		    for (int x = 1; x < imageWidth_middle; x++) {
+		    	
+		    	/*For each Pixel in image, determine if it is noticable by passing in 
+		    	 * the Image averageRGBPixelvalue.
+		    	 * 
+		    	 * If it is noticable, add it to the noticablePix list.
+		    	 * */
+		    	
+		    	imagePixelArray[x][y].initializeIsNoticable(averageRGBPixelvalue);
+		    	if (imagePixelArray[x][y].isNoticable()) noticablePixList1.add(imagePixelArray[x][y]);
+		    }
+		}   
+	}
+	
+	protected void findNoticablePixels2() {
+
+		for (int y = 1; y < imageHeight_middle; y++) {
+		    for (int x = imageWidth_middle; x < (imageWidth-1); x++) {
+		    	
+		    	/*For each Pixel in image, determine if it is noticable by passing in 
+		    	 * the Image averageRGBPixelvalue.
+		    	 * 
+		    	 * If it is noticable, add it to the noticablePix list.
+		    	 * */
+		    	
+		    	imagePixelArray[x][y].initializeIsNoticable(averageRGBPixelvalue);
+		    	if (imagePixelArray[x][y].isNoticable()) noticablePixList2.add(imagePixelArray[x][y]);
+		    }
+		}   
+	}
+	
+	protected void findNoticablePixels3() {
+
+		for (int y = imageHeight_middle; y < (imageHeight-1); y++) {
+			for (int x = imageWidth_middle; x < (imageWidth-1); x++) {
+		    	
+		    	/*For each Pixel in image, determine if it is noticable by passing in 
+		    	 * the Image averageRGBPixelvalue.
+		    	 * 
+		    	 * If it is noticable, add it to the noticablePix list.
+		    	 * */
+		    	
+		    	imagePixelArray[x][y].initializeIsNoticable(averageRGBPixelvalue);
+		    	if (imagePixelArray[x][y].isNoticable()) noticablePixList3.add(imagePixelArray[x][y]);
+		    }
+		}   
+	}
+
+	protected void findNoticablePixels4() {
+
+		for (int y = imageHeight_middle; y < (imageHeight-1); y++) {
+		    for (int x = 1; x < imageWidth_middle; x++) {
+		    	
+		    	/*For each Pixel in image, determine if it is noticable by passing in 
+		    	 * the Image averageRGBPixelvalue.
+		    	 * 
+		    	 * If it is noticable, add it to the noticablePix list.
+		    	 * */
+		    	
+		    	imagePixelArray[x][y].initializeIsNoticable(averageRGBPixelvalue);
+		    	if (imagePixelArray[x][y].isNoticable()) noticablePixList4.add(imagePixelArray[x][y]);
+		    }
+		}   
+	}
+	
+
+	
 	/*
 	 * Take a queue of noticable edge pixels and traverse thru them grouping
 	 * them into features using a recursive method "preorderTraversal".
 	 * 
 	 * */
-	@Override
-	protected void findFeatures() {
+
+	protected void findFeatures1() {
+		int mapPointer1=0;
 		try {
 			while (!Core1noticableEdgePixelsQueue.isEmpty()) {
 				preorderTraversal1(Core1noticableEdgePixelsQueue.remove());
 				
-				if (feature1.size()>10) mapFeatures1.put(mapPointer1, new Feature(feature1)); //, rawImage
+				if (feature1.size()>20) mapFeatures1.put(mapPointer1, new Feature(feature1)); //, rawImage
 				mapPointer1++;
 				feature1 = new ArrayList<Pixel>();
 			}
@@ -266,11 +353,12 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	
 	
 	protected void findFeatures2() {
+		int mapPointer2=0;
 		try {
 			while (!Core2noticableEdgePixelsQueue.isEmpty()) {
 				preorderTraversal2(Core2noticableEdgePixelsQueue.remove());
 				
-				if (feature2.size()>10) mapFeatures2.put(mapPointer2, new Feature(feature2)); //, rawImage
+				if (feature2.size()>20) mapFeatures2.put(mapPointer2, new Feature(feature2)); //, rawImage
 				mapPointer2++;
 				feature2 = new ArrayList<Pixel>();
 			}
@@ -307,13 +395,12 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	
 	
 	protected void findFeatures3() {
-
-
+		int mapPointer3=0;
 		try {
 			while (!Core3noticableEdgePixelsQueue.isEmpty()) {
 				preorderTraversal3(Core3noticableEdgePixelsQueue.remove());
 				
-				if (feature3.size()>10) mapFeatures3.put(mapPointer3, new Feature(feature3)); //, rawImage
+				if (feature3.size()>20) mapFeatures3.put(mapPointer3, new Feature(feature3)); //, rawImage
 				mapPointer3++;
 				feature3 = new ArrayList<Pixel>();
 			}
@@ -350,13 +437,12 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	
 	
 	protected void findFeatures4() {
-
-
+		int mapPointer4=0;
 		try {
 			while (!Core4noticableEdgePixelsQueue.isEmpty()) {
 				preorderTraversal4(Core4noticableEdgePixelsQueue.remove());
 				
-				if (feature4.size()>10) mapFeatures4.put(mapPointer4, new Feature(feature4)); //, rawImage
+				if (feature4.size()>20) mapFeatures4.put(mapPointer4, new Feature(feature4)); //, rawImage
 				mapPointer4++;
 				feature4 = new ArrayList<Pixel>();
 			}
@@ -377,6 +463,7 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	 * Pixel.
 	 */
 	
+	
 	private void preorderTraversal4(Pixel p) {
 
 		if(p !=  null && !feature4.contains(p) && p.isEdgePixel()) { 
@@ -391,7 +478,16 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 		}
 	}
 	
+	
+	
+	
 
+	public void boxFeaturesInImage(BufferedImage b) {
+		boxFeatures(b, mapFeatures1);
+		boxFeatures(b, mapFeatures2);
+		boxFeatures(b, mapFeatures3);
+		boxFeatures(b, mapFeatures4);
+	}
 	
 		
 	
@@ -414,9 +510,8 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	}
 	
 	public int getFeatures() {
-		return mapFeatures1.size() + mapFeatures2.size() + mapFeatures3.size() + mapFeatures4.size() ;
+		return mapFeatures1.size() + mapFeatures2.size() + mapFeatures3.size() + mapFeatures4.size();
 	}
-		
 }
 
 

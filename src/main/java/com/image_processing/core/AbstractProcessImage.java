@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -18,9 +19,11 @@ public abstract class AbstractProcessImage {
 	protected BufferedImage rawImage = null;  //raw user uploaded image
 	protected final int imageWidth;
 	protected final int imageHeight; 
+	protected final int imageWidth_middle;
+	protected final int imageHeight_middle;
 	protected Pixel[][] imagePixelArray;
 	protected int averageRGBPixelvalue;
-	protected List<Pixel> noticablePixList = new ArrayList<Pixel>();;
+	protected List<Pixel> noticablePixList = new ArrayList<Pixel>();
 	private Graphics2D g2d;
 	private final Color neon = new Color(58, 255, 20);	
 	
@@ -30,6 +33,8 @@ public abstract class AbstractProcessImage {
 		rawImage = b;
 		imageWidth = rawImage.getWidth();
 		imageHeight = rawImage.getHeight();
+		imageWidth_middle = (imageWidth/2);
+		imageHeight_middle = (imageHeight/2);
 		imagePixelArray = new Pixel[imageWidth][imageHeight]; //2-D Array comprised of type Pixel
 		initImagePixelArray();  // Load Pixels into above array
 		findAverageRGBPixelValueForImage();

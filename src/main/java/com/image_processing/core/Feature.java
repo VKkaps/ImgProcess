@@ -32,7 +32,7 @@ public class Feature {
 	}
 
 	private void findBoundary() {
-
+		
 		int firstX = featureGroup.get(0).getXcoor();
 		int firstY = featureGroup.get(0).getYcoor();
 

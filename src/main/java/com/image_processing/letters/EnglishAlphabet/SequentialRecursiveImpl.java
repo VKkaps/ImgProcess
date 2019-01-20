@@ -31,7 +31,6 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 		findNoticablePixels();
 		initializeNeighborPixels();
 		findFeatures();
-		boxFeatures(b, mapFeatures);
 	}
 	
 	
@@ -125,16 +124,10 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 		
 		Collections.sort(filteredPixList);
 		
-		System.out.println("before: " + noticablePixList.size());
-		
 		noticablePixList = filteredPixList;
 
-		System.out.println("after:" + noticablePixList.size());
-		
 		noticableEdgePixelsQueue = new LinkedList<Pixel>(noticablePixList);
-		
-		System.out.println("afterq: " + noticableEdgePixelsQueue.size());
-		
+
         final long endTime = System.currentTimeMillis();
         initTime = Math.toIntExact(endTime - startTime);
 

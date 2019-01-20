@@ -38,7 +38,7 @@ public class ProcessImageServlet extends HttpServlet {
         BufferedImage imBuff = ImageIO.read(fileContent);
 
         // Choose implementation here
-		new QuadParallelRecursiveImpl(imBuff);
+		new QuadParallelRecursiveImpl(imBuff).boxFeaturesInImage(imBuff);
 
      
         String base64String = encodeToString(imBuff, "jpg");
