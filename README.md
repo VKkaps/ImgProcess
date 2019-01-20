@@ -11,10 +11,14 @@ Chrome webpage: http://localhost:8080/ImgProcess/
 Current timing results:
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ![Timing pic](https://i.imgur.com/iF5eRQY.png)
 =======
 ![Timing pic](https://i.imgur.com/TIg1G6D.png)
 >>>>>>> 302c36985d9ad125ce85bb3c5ca315ddc03e15ea
+=======
+![Timing pic](https://i.imgur.com/iF5eRQY.png)
+>>>>>>> a45df057eb1618e293eefca0609eee2dd9cd6dda
 
 
 
