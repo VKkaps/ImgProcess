@@ -27,8 +27,7 @@ public class Feature {
 		featureImage = rawImage.getSubimage(boundaryArr[0], boundaryArr[1], (boundaryArr[2] - boundaryArr[0]), (boundaryArr[3] - boundaryArr[1]));
 		AbstractProcessImage.outputFile(featureImage, "C:/sample_images/Features/", "feature "
 				+ boundaryArr[0] + ", " + boundaryArr[1], "jpg");
-		System.out.println("Feature images saved to C:/sample_images/Features/");
-		
+		System.out.println("Feature images saved to C:/sample_images/Features/");	
 	}
 
 	private void findBoundary() {
@@ -48,12 +47,10 @@ public class Feature {
 			if (p.getYcoor() > lastY) lastY = p.getYcoor();
 		}
 		
-
 		boundaryArr[0] = firstX;
 		boundaryArr[1] = firstY;
 		boundaryArr[2] = lastX;
 		boundaryArr[3] = lastY;
-	
 	}
 
 	
@@ -66,8 +63,14 @@ public class Feature {
 	}
 		
 	public Pixel[][] getFeaturePixelsAs2DArray() {
-		return (Pixel[][]) featureGroup.toArray();
+		return (Pixel[][]) featureGroup.toArray();	
+	}
+	
+	public int getBoundaryArrSize() {
+		int width = boundaryArr[2] - boundaryArr[0];
+		int height = boundaryArr[3] - boundaryArr[1];
 		
+		return (width * height);	
 	}
 	
 }

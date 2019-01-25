@@ -17,23 +17,28 @@ import com.image_processing.core.AbstractProcessImage;
 import com.image_processing.core.Feature;
 import com.image_processing.core.Pixel;
 
+
+/*
+ * DualParallelRecursiveImpl is a class designed to optimize the original SequentialRecursiveImpl.
+ * This is done by splitting existing, time-consuming methods from SequentualRecursiveImpl into 2
+ *  threads of Execution.
+ * 
+ * */
 public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	
-	private List<Pixel> feature1 = new ArrayList<Pixel>();	
-	private List<Pixel> feature2 = new ArrayList<Pixel>();	
-	
-	private Map<Integer, Feature> mapFeatures1 = new HashMap<Integer, Feature>();
-	private Map<Integer, Feature> mapFeatures2 = new HashMap<Integer, Feature>();
-	
+	//Image is divided into 2 halves.  Each half has its own noticablePixels which are contained in these ArrayLists
 	private List<Pixel> noticablePixList1 = new ArrayList<Pixel>();
 	private List<Pixel> noticablePixList2 = new ArrayList<Pixel>();
 	
-	//2 isolated edge Pixel Queues for Parallelism processing purposes
+	//Image is divided into 2 halves.  Each half has its own features (letters) which are contained in these HashMaps
+	private Map<Integer, Feature> mapFeatures1 = new HashMap<Integer, Feature>();
+	private Map<Integer, Feature> mapFeatures2 = new HashMap<Integer, Feature>();
+	
+	//2 isolated noticable, edge Pixel Queues for Parallelism processing purposes
 	private Queue<Pixel> Core1noticableEdgePixelsQueue;
 	private Queue<Pixel> Core2noticableEdgePixelsQueue;
-
 	
-	//This list is used to store solely noticable edge Pixels as opposed to all Pixels in an image.
+	//This list is used to store solely noticable, edge Pixels as opposed to all noticable Pixels in an image.
 	private List<Pixel> edgePixList = new ArrayList<>();	
 	
 	// Fields needed for external testing/timing purposes
@@ -45,17 +50,18 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 
 	public DualParallelRecursiveImpl(BufferedImage b) {
 		super(b);
-		findNoticablePixels();
+		findNoticablePixels(); //concurrent
 		initializeNeighborPixels();
 		sortAndInitQueues();
-		findFeatures();
+		findFeatures();  //concurrent
+		//findAverageFeatureSize();
 	}
 	
 	
 	/*
-	 * Initializes the field 'noticablePixList'.  A pixel is determined to be noticable if 
-	 * it's average RGB value is less than (averageRGBPixelvalue - x), where x is a
-	 * arbitrary int value.
+	 * Initializes the parent field 'noticablePixList'.  A pixel is determined to be noticable if 
+	 * it's average RGB value is less than (averageRGBPixelvalue - x) where x is a
+	 * arbitrary int value, or the Pixel RGBAverage < 30. 
 	 * 
 	 * Note, for loop values are offset (1 instead of 0) to prevent ArrayOutOfBounds errors.
 	 * 
@@ -64,7 +70,7 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	protected void findNoticablePixels() {
 		final long startTime = System.currentTimeMillis();
 		
-		ExecutorService executorService = Executors.newFixedThreadPool(2);
+		ExecutorService executorService = Executors.newFixedThreadPool(4);
 
 		Future<?> f1 = executorService.submit(this::findNoticablePixels1);
 		Future<?> f2 = executorService.submit(this::findNoticablePixels2);
@@ -84,14 +90,14 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
         final long endTime = System.currentTimeMillis();
         findTime = Math.toIntExact(endTime - startTime);
 
-        System.out.println("\nfindNoticablePixels execution time: " + (endTime - startTime) + " ms");      
+        System.out.println("\nClass: DualParallelRecursiveImpl");             
+        System.out.println("findNoticablePixels execution time: " + (endTime - startTime) + " ms");      
 	}
 	
 	
 	/* For each pixel, check if neighbor pixels (left, right , top, and bottom) are noticable
 	 *  or not.  If so, initialize this noticable neighbor pixel in the current pixel.
 	 */
-	
 	private void initializeNeighborPixels() {
         final long startTime = System.currentTimeMillis();
         
@@ -134,7 +140,11 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 				p.setNoticableRB(imagePixelArray[rightX][bottomY]);
 			}
 			
-			
+			/* Creates new List of noticable Edge Pixels.  Edge Pixels are what are important
+			*  for building/finding Features in an image.  This optimizes performance.  If you used 
+			*  every pixel in an image, the program would use too much memory, run for too long, and
+			*  most likely be consumed with StackOverflow errors.
+			*/
 			if (p.determineIfEdgePixel()) {
 				edgePixList.add(p);
 			}
@@ -174,7 +184,7 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 
 	
 	/*
-	 * Execute 2 findFeatures methods concurrently.  Main Thread is paused until
+	 * Execute 4 findFeatures methods concurrently.  Main Thread is paused until
 	 * executeQuadSearch() completes.
 	 *  
 	 * findFeature methods have isolated resources, so no need for Synchronization.
@@ -184,11 +194,11 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	protected void findFeatures() {
 		final long startTimeOut = System.currentTimeMillis();
 		
-		ExecutorService executorService = Executors.newFixedThreadPool(2);
+		ExecutorService executorService = Executors.newFixedThreadPool(4);
 
 		Future<?> f1 = executorService.submit(this::findFeatures1);
 		Future<?> f2 = executorService.submit(this::findFeatures2);
-
+		
 		try {
 			f1.get();
 			f2.get();
@@ -205,12 +215,12 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	
 
 	
-	
+//////////CONCURRENT METHODS BELOW/////////////////
 	
 	protected void findNoticablePixels1() {
 
-		for (int y = 1; y < imageHeight_middle; y++) {
-		    for (int x = 1; x < imageWidth-1; x++) {
+		for (int y = 1; y < imageHeight; y++) {
+		    for (int x = 1; x < imageWidth_middle; x++) {
 		    	
 		    	/*For each Pixel in image, determine if it is noticable by passing in 
 		    	 * the Image averageRGBPixelvalue.
@@ -226,8 +236,8 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	
 	protected void findNoticablePixels2() {
 
-		for (int y = imageHeight_middle; y < imageHeight-1; y++) {
-		    for (int x = 1; x < imageWidth-1; x++) {
+		for (int y = 1; y < imageHeight; y++) {
+		    for (int x = imageWidth_middle+1; x < imageWidth; x++) {
 		    	
 		    	/*For each Pixel in image, determine if it is noticable by passing in 
 		    	 * the Image averageRGBPixelvalue.
@@ -241,23 +251,25 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 		}   
 	}
 	
-	
-	
+
 	
 	/*
-	 * Take a queue of noticable edge pixels and traverse thru them grouping
+	 * Take a queue of noticable, edge pixels and traverse thru them grouping
 	 * them into features using a recursive method "preorderTraversal".
 	 * 
 	 * */
 
 	protected void findFeatures1() {
 		int mapPointer1=0;
+		ArrayList<Pixel> feature1 = new ArrayList<Pixel>();	// Start with an empty arraylist, and create new one every time recursive traversal ends.
 		try {
 			while (!Core1noticableEdgePixelsQueue.isEmpty()) {
-				preorderTraversal1(Core1noticableEdgePixelsQueue.remove());
+				preorderTraversal1(Core1noticableEdgePixelsQueue.remove(), feature1);
 				
-				if (feature1.size()>20) mapFeatures1.put(mapPointer1, new Feature(feature1)); //, rawImage
-				mapPointer1++;
+				if (feature1.size()>20) {
+					mapFeatures1.put(mapPointer1, new Feature(feature1)); //, rawImage
+					mapPointer1++;
+				}
 				feature1 = new ArrayList<Pixel>();
 			}
 		} catch (StackOverflowError e) {
@@ -268,25 +280,24 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
         System.out.println("Number of Features in Core1: " + mapFeatures1.size() + " features");
 	}
 	
-	
 	/*
-	 * Recursive PreOrder Traversal of noticablePixels
+	 * Recursive PreOrder Traversal of noticablePixels.  Essentially builds Features via recursion.
 	 * If a current noticable pixel has a neighboring noticable pixel add current 
 	 * noticable pixel to a growing pixel list, which is a Feature.  Then, go thru
 	 * Recursive process starting with the current noticable pixel's right neighbor
 	 * Pixel.
 	 */
 	
-	private void preorderTraversal1(Pixel p) {
+	private void preorderTraversal1(Pixel p, ArrayList<Pixel> feature1) {
 
 		if(p !=  null && !feature1.contains(p) && p.isEdgePixel()) {  
 			feature1.add(p);
 			Core1noticableEdgePixelsQueue.remove(p);
 
-			preorderTraversal1(p.getRight());
-			preorderTraversal1(p.getBottom());
-			preorderTraversal1(p.getTop());
-			preorderTraversal1(p.getLeft());
+			preorderTraversal1(p.getRight(), feature1);
+			preorderTraversal1(p.getBottom(), feature1);
+			preorderTraversal1(p.getTop(), feature1);
+			preorderTraversal1(p.getLeft(), feature1);
 
 		}
 	}
@@ -294,12 +305,15 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	
 	protected void findFeatures2() {
 		int mapPointer2=0;
+		ArrayList<Pixel> feature2 = new ArrayList<Pixel>();	// Start with an empty arraylist, and create new one every time recursive traversal ends.
 		try {
 			while (!Core2noticableEdgePixelsQueue.isEmpty()) {
-				preorderTraversal2(Core2noticableEdgePixelsQueue.remove());
+				preorderTraversal2(Core2noticableEdgePixelsQueue.remove(), feature2);
 				
-				if (feature2.size()>20) mapFeatures2.put(mapPointer2, new Feature(feature2)); //, rawImage
-				mapPointer2++;
+				if (feature2.size()>20) {
+					mapFeatures2.put(mapPointer2, new Feature(feature2)); //, rawImage
+					mapPointer2++;
+				}
 				feature2 = new ArrayList<Pixel>();
 			}
 		} catch (StackOverflowError e) {
@@ -310,39 +324,60 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
         System.out.println("Number of Features in Core2: " + mapFeatures2.size() + " features");
 	}
 	
-	
-	/*
-	 * Recursive PreOrder Traversal of noticablePixels
-	 * If a current noticable pixel has a neighboring noticable pixel add current 
-	 * noticable pixel to a growing pixel list, which is a Feature.  Then, go thru
-	 * Recursive process starting with the current noticable pixel's right neighbor
-	 * Pixel.
-	 */
-	
-	private void preorderTraversal2(Pixel p) {
+	private void preorderTraversal2(Pixel p, ArrayList<Pixel> feature2) {
 
 		if(p !=  null && !feature2.contains(p) && p.isEdgePixel()) {  
 			feature2.add(p);
 			Core2noticableEdgePixelsQueue.remove(p);
 
-			preorderTraversal2(p.getRight());
-			preorderTraversal2(p.getBottom());
-			preorderTraversal2(p.getTop());
-			preorderTraversal2(p.getLeft());
+			preorderTraversal2(p.getRight(), feature2);
+			preorderTraversal2(p.getBottom(), feature2);
+			preorderTraversal2(p.getTop(), feature2);
+			preorderTraversal2(p.getLeft(), feature2);
 
 		}
 	}
 	
 	
+
+	
+	
+	
+	////////////GETTERS/////////////
+
 	public void boxFeaturesInImage(BufferedImage b) {
 		boxFeatures(b, mapFeatures1);
 		boxFeatures(b, mapFeatures2);
 	}
 
-	
+	private void findAverageFeatureSize() {
+		System.out.println("Average area of Feature 1 in pixels: " + getAverageFeature1Size());
+		System.out.println("Average area of Feature 2 in pixels: " + getAverageFeature2Size());
+	}
 		
+	private int getAverageFeature1Size() {
+		// mapFeatures1 = new HashMap<Integer, Feature>();
+		Feature f = null;
+		int ave=0;
+		for (int i=0; i<mapFeatures1.size(); i++) {
+			f = mapFeatures1.get(i);
+			ave += f.getBoundaryArrSize();
+		}
+		ave = ave / mapFeatures1.size();
+		return ave;
+	}
 	
-	////////////GETTERS/////////////
+	private int getAverageFeature2Size() {
+		// mapFeatures2 = new HashMap<Integer, Feature>();
+		Feature f = null;
+		int ave=0;
+		for (int i=0; i<mapFeatures2.size(); i++) {
+			f = mapFeatures2.get(i);
+			ave += f.getBoundaryArrSize();
+		}
+		ave = ave / mapFeatures2.size();
+		return ave;
+	}
 	
 	public int getFindTime() {
 		return findTime;
