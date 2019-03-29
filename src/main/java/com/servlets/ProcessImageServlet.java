@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.concurrent.ExecutionException;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
@@ -17,7 +16,7 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.codec.binary.Base64;
 
-import com.image_processing.letters.EnglishAlphabet.*;
+import com.image_processing.letters.EnglishAlphabet.SequentialRecursiveImpl;
 
 
 /**
@@ -38,7 +37,7 @@ public class ProcessImageServlet extends HttpServlet {
         BufferedImage imBuff = ImageIO.read(fileContent);
 
         // Choose implementation here
-		new QuadParallelRecursiveImpl(imBuff).boxFeaturesInImage(imBuff);
+		new SequentialRecursiveImpl(imBuff).boxFeaturesInImage(imBuff);
 
      
         String base64String = encodeToString(imBuff, "jpg");

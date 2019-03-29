@@ -7,7 +7,10 @@
 Desktop.ini
 derbyDB/
 src/main/java/testing/
+src/main/java/com/database/
 timingDB/
+lettersDB/
+EnglishAlphabet/
 *.sql
 
 # Thumbnail cache files

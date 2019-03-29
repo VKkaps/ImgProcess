@@ -37,16 +37,41 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 	private int findFeaturesTime;
 	
 
+	private int featureWidth = 0;
+	private int featureHeight = 0;
+	
+	private double[] topViewPercentages;
+	private double[] bottomViewPercentages;
+	private double[] rightViewPercentages;
+	private double[] leftViewPercentages;
+	
+	private int[] i;
+	
+	private static String[] numbers = new String[] {"One", "Two", "Three", "Four", "Five",
+	"Six", "Seven", "Eight", "Nine", "Zero"};
+	
+	private static String[] alphabet = new String[] {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"
+			, "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+
+	
+	int index=0;
+
+
 	public SequentialRecursiveImpl(BufferedImage b) {
 		super(b);
-		findNoticablePixels(); 
-		initializeNeighborPixels();
-		sortAndInitQueues();
-		findFeatures();  
-		//findAverageFeatureSize();
+		run();
 	}
 	
 	
+	public void run() {
+		findNoticablePixels(); 
+		initializeNeighborPixels();
+		sortAndInitQueues();
+		findFeatures();
+		index=0;
+	}
+
+
 	/*
 	 * Initializes the parent field 'noticablePixList'.  A pixel is determined to be noticable if 
 	 * it's average RGB value is less than (averageRGBPixelvalue - x) where x is a
@@ -55,9 +80,9 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 	 * Note, for loop values are offset (1 instead of 0) to prevent ArrayOutOfBounds errors.
 	 * 
 	 * */
-	protected void findNoticablePixels() {
+	public void findNoticablePixels() {
 		final long startTime = System.currentTimeMillis();
-		
+
 		for (int y = 1; y < imageHeight-1; y++) {
 		    for (int x = 1; x < imageWidth-1; x++) {
 		    	
@@ -75,15 +100,15 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
         final long endTime = System.currentTimeMillis();
         findTime = Math.toIntExact(endTime - startTime);
 
-        System.out.println("\nClass: SequentialRecursiveImpl");             
-        System.out.println("findNoticablePixels execution time: " + (endTime - startTime) + " ms");      
+       // System.out.println("\nClass: SequentialRecursiveImpl");             
+    //    System.out.println("findNoticablePixels execution time: " + (endTime - startTime) + " ms");      
 	}
 	
 	
 	/* For each pixel, check if neighbor pixels (left, right , top, and bottom) are noticable
 	 *  or not.  If so, initialize this noticable neighbor pixel in the current pixel.
 	 */
-	private void initializeNeighborPixels() {
+	public void initializeNeighborPixels() {
         final long startTime = System.currentTimeMillis();
         
 		int leftX;
@@ -130,9 +155,9 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 			*  every pixel in an image, the program would use too much memory, run for too long, and
 			*  most likely be consumed with StackOverflow errors.
 			*/
-			if (p.determineIfEdgePixel()) {
-				edgePixList.add(p);
-			}
+//			if (p.determineIfEdgePixel()) {
+//				edgePixList.add(p);
+//			}
 
 		}
 		
@@ -140,7 +165,7 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
         final long endTime = System.currentTimeMillis();
         initTime = Math.toIntExact(endTime - startTime);
 
-        System.out.println("initializeNeighborPixels execution time: " + initTime + " ms"); 
+    //    System.out.println("initializeNeighborPixels execution time: " + initTime + " ms"); 
 	}
 	
 	
@@ -148,19 +173,19 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 	 * Sort edgePixList, then split into 4 queues for processing
 	 * 
 	 * */
-	private void sortAndInitQueues() {
+	public void sortAndInitQueues() {
 		final long startTimeOut = System.currentTimeMillis();
 		
 		//Sort edgePixList by X coordinate
-		Collections.sort(edgePixList);
-		noticablePixList = edgePixList;
+		Collections.sort(noticablePixList);
+		//noticablePixList = edgePixList;
 		
 		Core1noticableEdgePixelsQueue = new LinkedList<Pixel>(noticablePixList);
 
 		final long endTimeOut = System.currentTimeMillis();
         sortTime = Math.toIntExact(endTimeOut - startTimeOut);
-        System.out.println("sortAndInitQueues execution time: " + sortTime  + " ms");	
-        System.out.println("Number of noticable edge pixels: " + noticablePixList.size() + " pixels");
+    //    System.out.println("sortAndInitQueues execution time: " + sortTime  + " ms");	
+    //    System.out.println("Number of noticable edge pixels: " + noticablePixList.size() + " pixels");
 	}
 
 	
@@ -170,18 +195,21 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 	 * 
 	 * */
 	@Override
-	protected void findFeatures() {
+	public void findFeatures() {
 		final long startTimeOut = System.currentTimeMillis();
 		
+
 		int mapPointer=0;
 		ArrayList<Pixel> feature = new ArrayList<Pixel>();	// Start with an empty arraylist, and create new one every time recursive traversal ends.
+		Feature f = null;
 		try {
 			while (!Core1noticableEdgePixelsQueue.isEmpty()) {
 				preorderTraversal(Core1noticableEdgePixelsQueue.remove(), feature);
-				
 				if (feature.size()>20) {
-					mapFeatures.put(mapPointer, new Feature(feature)); //, rawImage
+					f = new Feature(feature);//, rawImage, index, alphabet); //, rawImage, index);
+					mapFeatures.put(mapPointer, f); 
 					mapPointer++;
+					index++;
 				}
 				feature = new ArrayList<Pixel>();
 			}
@@ -189,12 +217,30 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 			System.out.println("\nStack overflow error!! -vfk: " + e.getMessage());
 			//System.exit(1);
 		}
+		//System.out.println(feature.size());
+		
+		featureWidth = f.getWidthOfFeature();
+		featureHeight = f.getHeightOfFeature();
+		
+		topViewPercentages = f.getTopViewPercentages();
+		bottomViewPercentages = f.getBottomViewPercentages();
+		leftViewPercentages = f.getLeftViewPercentages();
+		rightViewPercentages = f.getRightViewPercentages();
+		
+		 //top  bottom  left  right
+		i = f.getAllChangeAndTransitions();
+		
 
-        System.out.println("Number of Features: " + mapFeatures.size() + " features");
+       // System.out.println("Number of Features: " + mapFeatures.size() + " features");
+
         
 	    final long endTimeOut = System.currentTimeMillis();
 	    findFeaturesTime = Math.toIntExact(endTimeOut - startTimeOut);
-	    System.out.println("findFeatures execution time: " + findFeaturesTime  + " ms");
+	//    System.out.println("findFeatures execution time: " + findFeaturesTime  + " ms");
+	}
+	
+	private void findAverage() {
+		
 	}
 	
 	
@@ -205,9 +251,9 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 	 * Recursive process starting with the current noticable pixel's right neighbor
 	 * Pixel.
 	 */
-	private void preorderTraversal(Pixel p, ArrayList<Pixel> feature) {
+	public void preorderTraversal(Pixel p, ArrayList<Pixel> feature) {
 
-		if(p !=  null && !feature.contains(p) && p.isEdgePixel()) {  
+		if(p !=  null && !feature.contains(p)) { 
 			feature.add(p);
 			Core1noticableEdgePixelsQueue.remove(p);
 
@@ -217,8 +263,36 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 			preorderTraversal(p.getLeft(), feature);
 
 		}
+		
 	}
 	
+	
+	/*
+	 * Go thru entire Feature list and filter out any Features which contain features
+	 * 
+	 * */
+	private void checkIfFeatureIsInsideAFeature() {
+
+		Feature curr;
+		Feature next;
+		
+		int[] currArr;
+		int[] nextArr;
+		
+		for (int i=0; i<mapFeatures.size()-1; i++) {
+			curr = mapFeatures.get(i);
+			next = mapFeatures.get(i+1);
+			currArr = curr.getBoundaryArr();
+			nextArr = next.getBoundaryArr();
+			
+			if (nextArr[0]>currArr[0] && nextArr[1]>currArr[1] && nextArr[2]<currArr[2] && nextArr[3]<currArr[3]) {
+				mapFeatures.remove(i+1);
+			}
+			else mapFeatures.get(i).findTiers();
+			
+		}
+		
+	}
 	
 	
 	
@@ -228,22 +302,6 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 		boxFeatures(b, mapFeatures);
 	}
 
-	private void findAverageFeatureSize() {
-		System.out.println("Average area of Feature in pixels: " + getAverageFeatureSize());
-	}
-		
-	private int getAverageFeatureSize() {
-		// mapFeatures1 = new HashMap<Integer, Feature>();
-		Feature f = null;
-		int ave=0;
-		for (int i=0; i<mapFeatures.size(); i++) {
-			f = mapFeatures.get(i);
-			ave += f.getBoundaryArrSize();
-		}
-		ave = ave / mapFeatures.size();
-		return ave;
-	}
-	
 	public int getFindTime() {
 		return findTime;
 	}
@@ -263,6 +321,39 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 	public int getFeatures() {
 		return mapFeatures.size();
 	}
+	
+	public int getFeatureWidth() {
+		return featureWidth;
+	}
+	
+	public int getFeatureHeight() {
+		return featureHeight;
+	}
+	
+	public int getNumberOfFeaturesInImage() {
+		return mapFeatures.size();
+	}
+	
+	public double[] getTopViewPercentages() {
+		return topViewPercentages;
+	}
+
+	public double[] getBottomViewPercentages() {
+		return bottomViewPercentages;
+	}
+
+	public double[] getRightViewPercentages() {
+		return rightViewPercentages;
+	}
+
+	public double[] getLeftViewPercentages() {
+		return leftViewPercentages;
+	}
+	
+	public int[] getAllChangeAndTransitions() {
+		return i;
+	}
+	
 }
 
 

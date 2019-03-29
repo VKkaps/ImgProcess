@@ -18,8 +18,7 @@ public class Pixel implements Comparable<Pixel>{
 	//Important Pixel attributes
 	private boolean isNoticable=false;
 	private boolean isEdgePixel=false;
-	
-	
+		
 	//Left, Right, Top, Bottom Neighbor Pixels
 	private Pixel noticableLeft = null;
 	private Pixel noticableRight = null;
@@ -31,6 +30,8 @@ public class Pixel implements Comparable<Pixel>{
 	private Pixel noticableRT = null;
 	private Pixel noticableLB = null;
 	private Pixel noticableRB = null;
+	
+	private boolean hasBeenProcessed = false;
 	
 
 	//Constructor with an RGB int array and coordinates
@@ -61,9 +62,10 @@ public class Pixel implements Comparable<Pixel>{
 	 * 
 	 * */
 	public void initializeIsNoticable(int imageAverageRGBvalue) {
-		if (pixelRGBAverage < imageAverageRGBvalue-30 || pixelRGBAverage < 30) isNoticable = true;
+		if (pixelRGBAverage < imageAverageRGBvalue-60 || pixelRGBAverage < 50) isNoticable = true;
 		else isNoticable = false;		
 	}
+	
 	
 	/* This method is called externally after initializeNeighborPixels method has run.
 	 * The purpose is to check all neighbor pixels for a particular pixel, to see if the
@@ -85,6 +87,8 @@ public class Pixel implements Comparable<Pixel>{
 	public int compareTo(Pixel p) {
 		return (this.getXcoor() - p.getXcoor());
 	}
+	
+
 	
 	
 ///////////////////////////SETTERS&GETTERS///////////////////////////////////
@@ -205,6 +209,14 @@ public class Pixel implements Comparable<Pixel>{
 	
 	public boolean isEdgePixel() {
 		return isEdgePixel;
+	}
+	
+	public void processed() {
+		hasBeenProcessed = true;
+	}
+	
+	public boolean hasBeenProcessed() {
+		return hasBeenProcessed;
 	}
 
 }

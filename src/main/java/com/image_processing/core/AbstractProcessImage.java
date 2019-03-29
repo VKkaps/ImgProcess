@@ -8,22 +8,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.imageio.ImageIO;
 
-import com.image_processing.core.Pixel;
+
 
 public abstract class AbstractProcessImage {
 
 	protected BufferedImage rawImage = null;  //raw user uploaded image
+	
 	protected final int imageWidth;
 	protected final int imageHeight; 
 	protected final int imageWidth_middle;
 	protected final int imageHeight_middle;
-	protected Pixel[][] imagePixelArray;
+	
+	protected static Pixel[][] imagePixelArray;
 	protected int averageRGBPixelvalue;
 	protected List<Pixel> noticablePixList = new ArrayList<Pixel>();
+	
 	private Graphics2D g2d;
 	private final Color neon = new Color(58, 255, 20);	
 	
@@ -44,7 +46,6 @@ public abstract class AbstractProcessImage {
 	/*
 	 * Create a new 'Pixel' object for every pixel in user provided image
 	 * */	
-	
 	private void initImagePixelArray() {
 		for (int y = 0; y < imageHeight; y++) {
 		    for (int x = 0; x < imageWidth; x++) {
@@ -74,8 +75,7 @@ public abstract class AbstractProcessImage {
 	/*
 	 * Draw a Neon box around each Feature.
 	 * getBoundaryArr returns an int Array from the Feature of lowest/highest X and Y pixels
-	 * */
-	
+	 * */	
 	public BufferedImage boxFeatures(BufferedImage rawImage, Map<Integer, Feature> mapFeatures) {
 		g2d = rawImage.createGraphics();
 		g2d.setColor(neon);
@@ -94,8 +94,7 @@ public abstract class AbstractProcessImage {
 	 *	fourCoordinatesArr[2] = lastX;
 	 *  fourCoordinatesArr[3] = lastY;
 	 * 
-	 * */
-	
+	 * */	
 	public void drawNeonBox(BufferedImage b, int[] fourCoordinates) {
 		g2d.drawLine(fourCoordinates[0]-1, fourCoordinates[1]-1, fourCoordinates[2]+1, fourCoordinates[1]-1);
 		g2d.drawLine(fourCoordinates[0]-1, fourCoordinates[3]+1, fourCoordinates[2]+1, fourCoordinates[3]+1);
@@ -104,7 +103,10 @@ public abstract class AbstractProcessImage {
 
 	}
 		
-	
+	/*
+	 * Static method to output a BufferedImage to a specified directory.
+	 * 
+	 * */
 	public static void outputFile(BufferedImage b, String filePath, String imageName, String imageType) {
 		File outputFile = new File(filePath + imageName + "." + imageType);
 		try {
@@ -113,6 +115,32 @@ public abstract class AbstractProcessImage {
 			System.out.println("Error: Outputting image to filesystem.");
 			e.printStackTrace();
 		}
+	}
+	
+	/*
+	 * Returns a specified portion of the imagePixelArray as a 
+	 * 2D Integer Array
+	 * 
+	 * */
+	public static Integer[][] getFeatureAsIntArray(int[] boundaryArr){
+		int width = boundaryArr[2] - boundaryArr[0];
+		int height = boundaryArr[3] - boundaryArr[1];
+		
+		Integer[][] intArr = new Integer[width][height];
+		
+		for (int y = boundaryArr[1]; y < boundaryArr[3]; y++) {
+		    for (int x = boundaryArr[0]; x < boundaryArr[2]; x++) {
+		    	if (imagePixelArray[x][y].isNoticable()) {
+		    		intArr[x-boundaryArr[0]][y-boundaryArr[1]] = 1;
+		    	}
+		    	else intArr[x-boundaryArr[0]][y-boundaryArr[1]] = 0;
+		    	
+		    	System.out.print(intArr[x-boundaryArr[0]][y-boundaryArr[1]]+" ");
+		    }
+	    	System.out.println();
+
+		}	
+		return intArr;
 	}
 	
 	

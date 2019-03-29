@@ -56,11 +56,16 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 
 	public QuadParallelRecursiveImpl(BufferedImage b) {
 		super(b);
+		run();
+	}
+	
+	public void run(){
 		findNoticablePixels(); //concurrent
 		initializeNeighborPixels();
 		sortAndInitQueues();
 		findFeatures();  //concurrent
 		//findAverageFeatureSize();
+		System.out.println(mapFeatures1.size() + mapFeatures2.size() + mapFeatures3.size() + mapFeatures4.size());
 	}
 	
 	
@@ -72,8 +77,7 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	 * Note, for loop values are offset (1 instead of 0) to prevent ArrayOutOfBounds errors.
 	 * 
 	 * */
-	
-	protected void findNoticablePixels() {
+	public void findNoticablePixels() {
 		final long startTime = System.currentTimeMillis();
 		
 		ExecutorService executorService = Executors.newFixedThreadPool(4);
@@ -110,8 +114,7 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	/* For each pixel, check if neighbor pixels (left, right , top, and bottom) are noticable
 	 *  or not.  If so, initialize this noticable neighbor pixel in the current pixel.
 	 */
-	
-	private void initializeNeighborPixels() {
+	public void initializeNeighborPixels() {
         final long startTime = System.currentTimeMillis();
         
 		int leftX;
@@ -176,7 +179,7 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	 * Sort edgePixList, then split into 4 queues for processing
 	 * 
 	 * */
-	private void sortAndInitQueues() {
+	public void sortAndInitQueues() {
 		final long startTimeOut = System.currentTimeMillis();
 		
 		//Sort edgePixList by X coordinate
@@ -208,7 +211,7 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	 * 
 	 * */
 	@Override
-	protected void findFeatures() {
+	public void findFeatures() {
 		final long startTimeOut = System.currentTimeMillis();
 		
 		ExecutorService executorService = Executors.newFixedThreadPool(4);
@@ -482,6 +485,12 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 		System.out.println("Average area of Feature 3 in pixels: " + getAverageFeature3Size());
 		System.out.println("Average area of Feature 4 in pixels: " + getAverageFeature4Size());
 	}
+	
+	public int getNumberOfFeaturesInImage() {
+		return mapFeatures1.size() + mapFeatures2.size() + mapFeatures3.size() + mapFeatures4.size();
+	}
+	
+	
 		
 	private int getAverageFeature1Size() {
 		// mapFeatures1 = new HashMap<Integer, Feature>();
@@ -548,9 +557,12 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	}
 	
 	public int getFeatures() {
+		
 		return mapFeatures1.size() + mapFeatures2.size() + mapFeatures3.size() + mapFeatures4.size();
 	}
 }
+
+
 
 
 
