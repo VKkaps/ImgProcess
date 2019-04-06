@@ -219,16 +219,16 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 		}
 		//System.out.println(feature.size());
 		
-		featureWidth = f.getWidthOfFeature();
-		featureHeight = f.getHeightOfFeature();
-		
-		topViewPercentages = f.getTopViewPercentages();
-		bottomViewPercentages = f.getBottomViewPercentages();
-		leftViewPercentages = f.getLeftViewPercentages();
-		rightViewPercentages = f.getRightViewPercentages();
-		
-		 //top  bottom  left  right
-		i = f.getAllChangeAndTransitions();
+//		featureWidth = f.getWidthOfFeature();
+//		featureHeight = f.getHeightOfFeature();
+//		
+//		topViewPercentages = f.getTopViewPercentages();
+//		bottomViewPercentages = f.getBottomViewPercentages();
+//		leftViewPercentages = f.getLeftViewPercentages();
+//		rightViewPercentages = f.getRightViewPercentages();
+//		
+//		 //top  bottom  left  right
+//		i = f.getAllChangeAndTransitions();
 		
 
        // System.out.println("Number of Features: " + mapFeatures.size() + " features");
@@ -288,7 +288,7 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 			if (nextArr[0]>currArr[0] && nextArr[1]>currArr[1] && nextArr[2]<currArr[2] && nextArr[3]<currArr[3]) {
 				mapFeatures.remove(i+1);
 			}
-			else mapFeatures.get(i).findTiers();
+			//else mapFeatures.get(i).findTiers();
 			
 		}
 		
