@@ -75,11 +75,13 @@ public class Pixel implements Comparable<Pixel>{
 	public boolean determineIfEdgePixel() {
 		if (noticableLeft==null || noticableRight==null || noticableTop==null || noticableBottom==null 
 				|| noticableLT==null || noticableRT==null || noticableLB==null || noticableRB==null) {
-			isEdgePixel = true;
+			isEdgePixel=true;
+			return true;
 		}
-		else isEdgePixel = false;
-		
-		return isEdgePixel;
+		else {
+			isEdgePixel=false;
+			return false;
+		}
 	}
 	
 

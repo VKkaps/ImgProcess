@@ -123,24 +123,40 @@ public abstract class AbstractProcessImage {
 	 * 
 	 * */
 	public static Integer[][] getFeatureAsIntArray(int[] boundaryArr){
-		int width = boundaryArr[2] - boundaryArr[0];
-		int height = boundaryArr[3] - boundaryArr[1];
+		int width = boundaryArr[2] - boundaryArr[0] +4;
+		int height = boundaryArr[3] - boundaryArr[1] +4;
 		
 		Integer[][] intArr = new Integer[width][height];
+
 		
 		for (int y = boundaryArr[1]; y < boundaryArr[3]; y++) {
 		    for (int x = boundaryArr[0]; x < boundaryArr[2]; x++) {
 		    	if (imagePixelArray[x][y].isNoticable()) {
-		    		intArr[x-boundaryArr[0]][y-boundaryArr[1]] = 1;
+		    		if (imagePixelArray[x][y].determineIfEdgePixel()) {
+		    			intArr[x-boundaryArr[0]+2][y-boundaryArr[1]+2] = 1;
+		    		}
+		    		else intArr[x-boundaryArr[0]+2][y-boundaryArr[1]+2] = 3;
+		    		
 		    	}
-		    	else intArr[x-boundaryArr[0]][y-boundaryArr[1]] = 0;
-		    	
-		    	System.out.print(intArr[x-boundaryArr[0]][y-boundaryArr[1]]+" ");
+		    	else intArr[x-boundaryArr[0]+2][y-boundaryArr[1]+2] = 0;
 		    }
-	    	System.out.println();
-
 		}	
+		
+		for (int x=0;x<width;x++) {
+			intArr[x][0]=0;
+			intArr[x][1]=0;
+			intArr[x][height-1]=0;
+			intArr[x][height-2]=0;
+		}
+		for (int y=0;y<height;y++) {
+			intArr[0][y]=0;
+			intArr[1][y]=0;
+			intArr[width-1][y]=0;
+			intArr[width-2][y]=0;
+		}
+
 		return intArr;
+			
 	}
 	
 	

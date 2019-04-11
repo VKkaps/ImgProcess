@@ -16,6 +16,7 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.codec.binary.Base64;
 
+import com.image_processing.letters.EnglishAlphabet.DualParallelRecursiveImpl;
 import com.image_processing.letters.EnglishAlphabet.SequentialRecursiveImpl;
 
 
