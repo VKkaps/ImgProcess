@@ -26,20 +26,28 @@ public class Letter {
 	private Boolean hasUpperLoop = false;
 	private Boolean hasLowerLoop = false;
 	private int numOfLoops = 0;
-	private ArrayList<String> temp = new ArrayList<String>();
-	Integer[][] copy;
+	Integer[][] copy = null;
 	private ArrayList<Integer> verticalTransitionPoints = new ArrayList<Integer>();	
 		
-	boolean b = false;
+	CircularLinkedList<Character> circularArr = new CircularLinkedList<Character>();
 	LinkedList<Character> cArr = new LinkedList<Character>();
-	Queue<Character> queue = null; 
 	
-	int c_curve = 0;
-	int D_curve = 0;
-	int A_edge = 0;
-	int flat = 0;
-	int column = 0;
-	int corner = 0;
+	LinkedList<Character> directionLL = new LinkedList<Character>();
+	
+	// top, bottom, left, right
+	private double[] firstQuarter = null;
+	private double[] secondQuarter = null;
+	private double[] threeQuarter = null;
+	private double[] fourthQuarter = null;
+	
+	
+	double curved_Percentage=0.0;
+	double sharp_Percentage=0.0;
+	double column_Percentage=0.0;
+	double flat_Percentage=0.0;
+	double corner_Percentage=0.0;
+	
+	double[] percentageArr = null;
 	
 	private double leftUpper_dXdY = 0.0;
 	private double leftLower_dXdY = 0.0;
@@ -53,14 +61,9 @@ public class Letter {
 	private double bottomUpper_dXdY = 0.0;
 	private double bottomLower_dXdY = 0.0;
 	
-	int oneTop = 0;
-	int oneBottom = 0;
-	int oneLeft = 0;
-	int oneRight = 0;
-	
 	String letter = "_";
 	private double percentMatch = 0.0;
-	double[] tempD = null;
+	
 
 	
 /////////////////////////////////////////////////////////////////////////////////
@@ -76,58 +79,21 @@ public class Letter {
 		createFeatureIntegerArray();
 		loopDetection();
 		slopeDetection();
+		
 		findExternalEdgeofLetter();
-		generateCircularSeqCharacterList();
-		classify();
+		generateDirectionList();
+		newClassify();
 		
-		identifyLetter();
-
-		System.out.println(letter + ", " + percentMatch);
+		//classify();
+		//identifyLetter();
 		
+		printLetterInfo();
+		//printIntegerArray();
 	}
 
 	
 	
-	private void findExternalEdgeofLetter() {
-		for (int y=1;y<featureHeight-1;y++) {
-			for (int x=1;x<featureWidth-1;x++) {
-				if (featureIntArray[x][y]==0) {
-					if (featureIntArray[x-1][y]==1 || featureIntArray[x+1][y]==1 ||
-							featureIntArray[x][y-1]==1 || featureIntArray[x][y+1]==1) {
-						featureIntArray[x][y]=5;
-					}
-				}
-			}
-		}
-		for (int y=1;y<featureHeight-1;y++) {
-			for (int x=1;x<featureWidth-1;x++) {
-				if (featureIntArray[x][y]==0) {
-					
-					if (featureIntArray[x+1][y]==5 && featureIntArray[x][y+1]==5 &&
-							featureIntArray[x+1][y+1]==1) {
-						featureIntArray[x][y]=5;
-					}
-					else if (featureIntArray[x-1][y]==5 && featureIntArray[x][y+1]==5 &&
-							featureIntArray[x-1][y+1]==1) {
-						featureIntArray[x][y]=5;
-					}
-					else if (featureIntArray[x][y-1]==5 && featureIntArray[x-1][y]==5 &&
-							featureIntArray[x-1][y-1]==1) {
-						featureIntArray[x][y]=5;
-					}
-					else if (featureIntArray[x][y-1]==5 && featureIntArray[x+1][y]==5 &&
-							featureIntArray[x+1][y-1]==1) {
-						featureIntArray[x][y]=5;
-					}
-					
-				}
-			}
-		}
-		System.out.println("\n");
-	}
-	
-	
-	private void generateCircularSeqCharacterList() {
+	private void generateDirectionList() {
 		
 		int firstX = 0;
 		
@@ -138,57 +104,21 @@ public class Letter {
 			}
 		}
 		
+		circularArr.insertAtBeginning('s');
+		
 		recursiveIt(firstX, featureHeight/2);
 		
 		featureIntArray[firstX][featureHeight/2+1]=2;
-		
+		circularArr.deleteFromPosition(0);
 
-		for (int x=0; x<featureWidth;x++) {
-			if (featureIntArray[x][featureHeight/2]==1) {
-				firstX = x;
-				break;
+		if (circularArr.searchByIndex(circularArr.size()-1).item=='b') {
+			if (circularArr.searchByIndex(circularArr.size()-2).item=='t') {
+				circularArr.deleteFromPosition(circularArr.size()-1);
 			}
 		}
 		
-		//newRecursivetest(firstX, featureHeight/2);
-		
-		
-		for (int y=0;y<featureHeight;y++) {
-			for (int x=0;x<featureWidth;x++) {
-				if (featureIntArray[x][y]==1) {
-					if (featureIntArray[x-1][y-1]==8) {
-						featureIntArray[x][y]=7;
-					}
-					else if (featureIntArray[x][y-1]==8) {
-						featureIntArray[x][y]=7;
-					}
-					else if (featureIntArray[x+1][y-1]==8) {
-						featureIntArray[x][y]=7;
-					}
-					else if (featureIntArray[x-1][y]==8) {
-						featureIntArray[x][y]=7;
-					}
-					else if (featureIntArray[x][y]==8) {
-						featureIntArray[x][y]=7;
-					}
-					else if (featureIntArray[x+1][y]==8) {
-						featureIntArray[x][y]=7;
-					}
-					else if (featureIntArray[x-1][y+1]==8) {
-						featureIntArray[x][y]=7;
-					}
-					else if (featureIntArray[x][y+1]==8) {
-						featureIntArray[x][y]=7;
-					}
-					else if (featureIntArray[x+1][y+1]==8) {
-						featureIntArray[x][y]=7;
-					}
-				}
-			}
-		}
-		
-		
-		
+		//rotateCircularListToFirstTransition();
+
 		for (int y=0;y<featureHeight;y++) {
 			for (int x=0;x<featureWidth;x++) {
 				if (featureIntArray[x][y]!=2) {
@@ -197,76 +127,222 @@ public class Letter {
 			}
 		}
 		
-		printIntegerArray();
-		System.out.println(featureWidth + ", " + featureHeight);
+		for (int i=0;i<circularArr.size();i++) {
+			directionLL.add(circularArr.searchByIndex(i).item);
+		}
+		printDirectionList();
 	}
 			
+	private void newClassify() {
+		int size = directionLL.size()/4;
+		
+		int start = 0;
+		int quarter = size;
+		int half = size*2;
+		int threeQ = size*3;
+		
+		char[] firstSection = new char[quarter-start];
+		char[] secondSection = new char[half-quarter];
+		char[] thirdSection = new char[threeQ-half];
+		char[] fourthSection = new char[directionLL.size()-threeQ];
+		
+		for (int i=0;i<firstSection.length;i++) {
+			firstSection[i]=directionLL.get(i);
+		}
+		for (int i=0;i<secondSection.length;i++) {
+			secondSection[i]=directionLL.get(i+firstSection.length);
+		}
+		for (int i=0;i<thirdSection.length;i++) {
+			thirdSection[i]=directionLL.get(i+secondSection.length);
+		}
+		for (int i=0;i<fourthSection.length;i++) {
+			fourthSection[i]=directionLL.get(i+thirdSection.length);
+		}
+		System.out.println();
+		
+		firstQuarter = findDirectionAve(firstSection);
+		secondQuarter = findDirectionAve(secondSection);
+		threeQuarter = findDirectionAve(thirdSection);
+		fourthQuarter = findDirectionAve(fourthSection);
+
+		compareC();
+	}
 	
+	private double[] findDirectionAve(char[] chArr) {
+		int top =0;
+		int bottom = 0;
+		int left = 0;
+		int right = 0;
+		
+		for (char ch : chArr) {
+			if (ch=='t') {
+				top++;
+			}
+			else if (ch=='b') {
+				bottom++;
+			}
+			else if (ch=='l') {
+				left++;
+			}
+			else if (ch=='r') {
+				right++;
+			}
+		}
+		double t = round((double) top / (double) chArr.length,2);
+		double b = round((double) bottom / (double) chArr.length,2);
+		double l = round((double) left / (double) chArr.length,2);
+		double r = round((double) right / (double) chArr.length,2);
+		
+		double[] dArr = new double[]{t,b,l,r};
+		
+		return dArr;
+		
+	}
+	
+	private void compareC() {
+		double[] first = new double[] {0.327, 0.114, 0.0, 0.56};
+		double[] second = new double[] {0.146, 0.386, 0.449, 0.021};
+		double[] third = new double[] {0.146, 0.386, 0.449, 0.021};
+		double[] fourth = new double[] {0.142, 0.397, 0.439, 0.023};
+		
+		double[] resultOne = new double[4];
+		double[] resultTwo = new double[4];
+		double[] resultThree = new double[4];
+		double[] resultFour = new double[4];
+		
+		for (int i=0;i<4;i++) {
+			resultOne[i] = percentSimilarityBetweenTwoDoubles(first[i], firstQuarter[i]);
+			resultTwo[i] = percentSimilarityBetweenTwoDoubles(second[i], secondQuarter[i]);
+			resultThree[i] = percentSimilarityBetweenTwoDoubles(third[i], threeQuarter[i]);
+			resultFour[i] = percentSimilarityBetweenTwoDoubles(fourth[i], fourthQuarter[i]);
+		}
+		
+		double o = 0.0;
+		double t = 0.0;
+		double thr = 0.0;
+		double f = 0.0;
+		
+		for (int i=0;i<4;i++) {
+			o+=resultOne[i];
+		}
+		for (int i=0;i<4;i++) {
+			t+=resultTwo[i];
+		}
+		for (int i=0;i<4;i++) {
+			thr+=resultThree[i];
+		}
+		for (int i=0;i<4;i++) {
+			f+=resultFour[i];
+		}
+		
+		o = o/4;
+		t = t/4;
+		thr = thr/4;
+		f = f/4;
+		
+		double aver = (o+t+thr+f)/4;
+		
+		double percentResult = round(aver,2);
+		
+		percentMatch=percentResult;
+		
+	}
+	
+	private void rotateCircularListToFirstTransition() {
+		int newStart = 0;
+		char firstChar = circularArr.searchByIndex(newStart).item;
+		char nextChar = circularArr.searchByIndex(newStart+1).item;
+
+		while(firstChar==nextChar) {
+			
+			firstChar = circularArr.searchByIndex(newStart).item;
+			firstChar = circularArr.searchByIndex(newStart+1).item;
+			
+			newStart++;
+		}
+
+		LinkedList<Character> Arrtemp = null;
+
+		Arrtemp = new LinkedList<Character>();
+		for (int i=0;i<circularArr.size()-newStart;i++) {
+			Arrtemp.add(circularArr.searchByIndex(i+newStart).item);
+		}
+		
+		for (int z=0; z<newStart;z++) {
+			Arrtemp.add(circularArr.searchByIndex(circularArr.size()-newStart+z).item);
+		}
+		cArr=Arrtemp;
+	}
 	
 	public void recursiveIt(int x, int y) {
 		
 		//top
 		if (featureIntArray[x][y-1]==5) {
-			cArr.add('t');
+			circularArr.insertAtPosition('t', circularArr.size());
 			featureIntArray[x][y]=2;
 			recursiveIt(x, y-1);
 		}
 		
 		//right
 		if (featureIntArray[x+1][y]==5) {
-			cArr.add('r');
+			circularArr.insertAtPosition('r', circularArr.size());
 			featureIntArray[x][y]=2;
 			recursiveIt(x+1, y);
 		}
 		
 		//left
 		if (featureIntArray[x-1][y]==5) {
-			cArr.add('l');
+			circularArr.insertAtPosition('l', circularArr.size());
 			featureIntArray[x][y]=2;
 			recursiveIt(x-1, y);
 		}
 		
 		//bottom
 		if (featureIntArray[x][y+1]==5) {
-			cArr.add('b');
+			circularArr.insertAtPosition('b', circularArr.size());
 			featureIntArray[x][y]=2;
 			recursiveIt(x, y+1);
 		}
+		
+
+		
 
 	}
 
-	
-	
-	
-	
-	
 	private void classify() {
-		//queue = new LinkedList<>(cArr);
+		
 
-		LinkedList<Character> cArr1 = new LinkedList<Character>(cArr);
-		LinkedList<Character> cArr2 = new LinkedList<Character>(cArr);
-		LinkedList<Character> cArr3 = new LinkedList<Character>(cArr);
-		LinkedList<Character> cArr4 = new LinkedList<Character>(cArr);
-		
-		
+		int c_curve = 0;
+		int A_edge = 0;
+		int flat = 0;
+		int column = 0;
+		int corner = 0;
+		int fourFive = 0;
+
 		// flat check
-		for (int i=0;i<cArr1.size()-4;i++) {
-			if (cArr1.get(i)=='r') {
-				if (cArr1.get(i+1)=='r') {
-					if (cArr1.get(i+2)=='r') {
-						if (cArr1.get(i+3)=='r') {
-							flat++;
-							i+=4;
+		for (int i=0;i<directionLL.size()-4;i++) {
+			
+			
+			if (directionLL.get(i)=='r') {
+				if (directionLL.get(i+1)=='r') {
+					if (directionLL.get(i+2)=='r') {
+						if (directionLL.get(i+3)=='r') {
+							if (directionLL.get(i+4)=='r') {
+								flat++;
+								i+=5;
+							}
 						}
 					}
 				}
 			}
-			else if (cArr1.get(i)=='l') {
-				if (cArr1.get(i+1)=='l') {
-					if (cArr1.get(i+2)=='l') {
-						if (cArr1.get(i+3)=='l') {
-							flat++;
-							i+=4;
+			else if (directionLL.get(i)=='l') {
+				if (directionLL.get(i+1)=='l') {
+					if (directionLL.get(i+2)=='l') {
+						if (directionLL.get(i+3)=='l') {
+							if (directionLL.get(i+4)=='l') {
+								flat++;
+								i+=5;
+							}
 						}
 					}
 				}
@@ -274,23 +350,27 @@ public class Letter {
 		}
 		
 		//column check
-		for (int i=0;i<cArr2.size()-4;i++) {
-			if (cArr2.get(i)=='t') {
-				if (cArr2.get(i+1)=='t') {
-					if (cArr2.get(i+2)=='t') {
-						if (cArr2.get(i+3)=='t') {
-							column++;
-							i+=4;
+		for (int i=0;i<circularArr.size()-4;i++) {
+			if (directionLL.get(i)=='t') {
+				if (directionLL.get(i+1)=='t') {
+					if (directionLL.get(i+2)=='t') {
+						if (directionLL.get(i+3)=='t') {
+							if (directionLL.get(i+4)=='t') {
+								column++;
+								i+=5;
+							}
 						}
 					}
 				}
 			}
-			else if (cArr2.get(i)=='b') {
-				if (cArr2.get(i+1)=='b') {
-					if (cArr2.get(i+2)=='b') {
-						if (cArr2.get(i+3)=='b') {
-							column++;
-							i+=4;
+			else if (directionLL.get(i)=='b') {
+				if (directionLL.get(i+1)=='b') {
+					if (directionLL.get(i+2)=='b') {
+						if (directionLL.get(i+3)=='b') {
+							if (directionLL.get(i+4)=='b') {
+								column++;
+								i+=5;
+							}
 						}
 					}
 				}
@@ -298,80 +378,63 @@ public class Letter {
 		}
 		
 		//A-edge
-		for (int i=0;i<cArr3.size()-4;i++) {
-			if (cArr3.get(i)=='t') {
-				if (cArr3.get(i+1)=='t') {
-					if (cArr3.get(i+2)=='t') {
-						if (cArr3.get(i+3)=='r') {
-							if (cArr3.get(i+4)=='t') {
+		for (int i=0;i<circularArr.size()-4;i++) {
+			if (directionLL.get(i)=='r') {
+				if (directionLL.get(i+1)=='t') {
+					if (directionLL.get(i+2)=='t') {
+						if (directionLL.get(i+3)=='t') {
+							if (directionLL.get(i+4)=='r') {
 								A_edge++;
-								i+=4;
 							}
 						}
-						else if (cArr3.get(i+3)=='l') {
-							if (cArr3.get(i+4)=='t') {	
-								A_edge++;
-								i+=4;
-							}
+						else if (directionLL.get(i+3)=='r') {
+							A_edge++;
 						}
 					}
 				}
 			}
-			else if (cArr3.get(i)=='b') {
-				if (cArr3.get(i+1)=='b') {
-					if (cArr3.get(i+2)=='b') {
-						if (cArr3.get(i+3)=='r') {
-							if (cArr3.get(i+4)=='b') {
+			else if (directionLL.get(i)=='r') {
+				if (directionLL.get(i+1)=='b') {
+					if (directionLL.get(i+2)=='b') {
+						if (directionLL.get(i+3)=='b') {
+							if (directionLL.get(i+4)=='r') {
 								A_edge++;
-								i+=4;
 							}
 						}
-						else if (cArr3.get(i+3)=='l') {
-							if (cArr3.get(i+4)=='b') {	
-								A_edge++;
-								i+=4;
-							}
+						else if (directionLL.get(i+3)=='r') {
+							A_edge++;
 						}
 					}
-
 				}
 			}
 		}	
 		
 		//c-curve check
-		for (int i=0;i<cArr4.size()-4;i++) {
-			if (cArr3.get(i)=='l') {
-				if (cArr3.get(i+1)=='l') {
-					if (cArr3.get(i+2)=='l') {
-						if (cArr3.get(i+3)=='t') {
-							if (cArr3.get(i+4)=='l') {
+		for (int i=0;i<circularArr.size()-4;i++) {
+			if (directionLL.get(i)=='t') {
+				if (directionLL.get(i+1)=='r') {
+					if (directionLL.get(i+2)=='r') {
+						if (directionLL.get(i+3)=='r') {
+							if (directionLL.get(i+4)=='t') {
 								c_curve++;
-								i+=4;
 							}
 						}
-						else if (cArr3.get(i+3)=='b') {
-							if (cArr3.get(i+4)=='l') {	
-								c_curve++;
-								i+=4;
-							}
+						else if (directionLL.get(i+3)=='t') {
+							c_curve++;
 						}
 					}
 				}
 			}
-			else if (cArr3.get(i)=='r') {
-				if (cArr3.get(i+1)=='r') {
-					if (cArr3.get(i+2)=='r') {
-						if (cArr3.get(i+3)=='t') {
-							if (cArr3.get(i+4)=='r') {
+			else if (directionLL.get(i)=='b') {
+				if (directionLL.get(i+1)=='r') {
+					if (directionLL.get(i+2)=='r') {
+						if (directionLL.get(i+3)=='r') {
+							if (directionLL.get(i+4)=='b') {
 								c_curve++;
-								i+=4;
 							}
 						}
-						else if (cArr3.get(i+3)=='b') {
-							if (cArr3.get(i+4)=='r') {	
-								c_curve++;
-								i+=4;
-							}
+						else if (directionLL.get(i+3)=='b') {
+							c_curve++;
 						}
 					}
 				}
@@ -382,92 +445,113 @@ public class Letter {
 		
 		
 		//corner check
-		for (int i=0;i<cArr4.size()-6;i++) {
-			if (cArr3.get(i)=='b') {
-				if (cArr3.get(i+1)=='b') {
-						if (cArr3.get(i+2)=='r') {
-							if (cArr3.get(i+3)=='r') {
-								corner++;
-							}
-						}
-						else if (cArr3.get(i+2)=='l') {
-							if (cArr3.get(i+3)=='l') {
-								corner++;
-							}
-						}
-				
-				}
-			}	
-			
-			else if (cArr3.get(i)=='r') {
-				if (cArr3.get(i+1)=='r') {
-						if (cArr3.get(i+2)=='t') {
-							if (cArr3.get(i+3)=='t') {
-								corner++;
-							}
-						}
-						else if (cArr3.get(i+2)=='b') {
-							if (cArr3.get(i+3)=='b') {
-								corner++;
-							}
-						}
-				}
-			}	
-			
-			else if (cArr3.get(i)=='l') {
-				if (cArr3.get(i+1)=='l') {
-					if (cArr3.get(i+2)=='t') {
-						if (cArr3.get(i+3)=='t') {
+		for (int i=0;i<circularArr.size()-3;i++) {
+			if (directionLL.get(i)=='b') {
+				if (directionLL.get(i+1)=='b') {
+					if (directionLL.get(i+2)=='r') {
+						if (directionLL.get(i+3)=='r') {
 							corner++;
 						}
 					}
-				else if (cArr3.get(i+3)=='b') {
-					if (cArr3.get(i+4)=='b') {
-						corner++;
-					}
+					else if (directionLL.get(i+2)=='l') {
+						if (directionLL.get(i+3)=='l') {
+							corner++;
+						}
+					}	
 				}
-				}
-			}
+			}	
 			
-			else if (cArr3.get(i)=='t') {
-				if (cArr3.get(i+1)=='t') {
-					if (cArr3.get(i+2)=='l') {
-						if (cArr3.get(i+3)=='l') {
+			else if (directionLL.get(i)=='r') {
+				if (directionLL.get(i+1)=='r') {
+					if (directionLL.get(i+2)=='t') {
+						if (directionLL.get(i+3)=='t') {
 							corner++;
 						}
 					}
-					else if (cArr3.get(i+2)=='r') {
-						if (cArr3.get(i+3)=='r') {
+					else if (directionLL.get(i+2)=='b') {
+						if (directionLL.get(i+3)=='b') {
+							corner++;
+						}
+					}
+				}
+			}	
+			
+			else if (directionLL.get(i)=='l') {
+				if (directionLL.get(i+1)=='l') {
+					if (directionLL.get(i+2)=='t') {
+						if (directionLL.get(i+3)=='t') {
+							corner++;
+						}
+					}
+					else if (directionLL.get(i+2)=='b') {
+						if (directionLL.get(i+3)=='b') {
 							corner++;
 						}
 					}
 				}
 			}
 			
-			double ctemp = ((double) c_curve / (double) cArr.size())*100 ;
-			double Atemp = ((double) A_edge / (double) cArr.size())*100 ;
-			double ftemp = ((double) flat / (double) cArr.size())*100 ;
-			double coltemp = ((double) column / (double) cArr.size())*100 ;
+			else if (directionLL.get(i)=='t') {
+				if (directionLL.get(i+1)=='t') {
+					if (directionLL.get(i+2)=='l') {
+						if (directionLL.get(i+3)=='l') {
+							corner++;
+						}
+					}
+					else if (directionLL.get(i+2)=='r') {
+						if (directionLL.get(i+3)=='r') {
+							corner++;
+						}
+					}
+				}
+			}
+		}
+		
+		//45 degree angle check
+		for (int i=0;i<circularArr.size()-3;i++) {
 			
-			double c = round(ctemp,2);
-			double A = round(Atemp,2);
-			double f = round(ftemp,2);
-			double col = round(coltemp,2);
-			
-			tempD = new double[] {c, A, f, col, corner, verticalTransitionPoints.size()}; 
-			
-			
-			
-		}			
-					
-					
-
+			if (directionLL.get(i)=='r') {
+				if (directionLL.get(i+1)=='t') {
+					if (directionLL.get(i+2)=='r') {
+						fourFive++;
+					}
+				}
+				else if (directionLL.get(i+1)=='b') {
+					if (directionLL.get(i+2)=='r') {
+						fourFive++;
+					}
+				}
+			}
+			else if (directionLL.get(i)=='l') {
+				if (directionLL.get(i+1)=='t') {
+					if (directionLL.get(i+2)=='l') {
+						fourFive++;
+					}
+				}
+				else if (directionLL.get(i+1)=='b') {
+					if (directionLL.get(i+2)=='l') {
+						fourFive++;
+					}
+				}
+			}
+		}
 		
 		
+		double ctemp = ((double) c_curve / (double) directionLL.size())*100 ;
+		double Atemp = ((double) A_edge / (double) directionLL.size())*100 ;
+		double ftemp = ((double) flat / (double) directionLL.size())*100 ;
+		double coltemp = ((double) column / (double) directionLL.size())*100 ;
+		double cornertemp = ((double) corner / (double) directionLL.size())*100 ;
+		
+		curved_Percentage = round(ctemp,2);
+		sharp_Percentage=round(Atemp,2);
+		column_Percentage= round(coltemp,2);
+		flat_Percentage = round(ftemp,2);
+		corner_Percentage = round(cornertemp,2);
+		
+		percentageArr = new double[] {curved_Percentage, sharp_Percentage, 
+				flat_Percentage, column_Percentage, corner_Percentage}; 
 	}
-	
-	
-
 	
 	private void identifyLetter() {
 
@@ -483,7 +567,7 @@ public class Letter {
 			if (0.0<=leftUpper_dXdY && leftUpper_dXdY<0.45 && 
 					-0.45<=leftLower_dXdY && leftLower_dXdY<=0.0) {
 
-				checkMatch(tempD);
+				checkMatch(percentageArr);
 				
 				//letter = "leftColumn";
 			}
@@ -544,54 +628,23 @@ public class Letter {
 	
 	private void checkMatch(double[] arr) {
 		
-		double[] K = new double[] {0.94, 0.94, 1.89, 4.72, 4.0, 2.0};
-		double[] M = new double[] {0.74, 5.19, 2.22, 9.63, 7.0, 1.0};
-		double[] N = new double[] {0.0, 0.0, 1.77, 8.85, 6.0, 1.0};
-		double[] E = new double[] {0.0, 0.0, 12.0, 5.0, 12.0, 3.0};
-		double[] F = new double[] {0.0, 0.0, 7.89, 6.58, 10, 2.0};
-		double[] L = new double[] {0.0, 0.0, 6.67, 10.0, 6.0, 1.0};
+		double[] K = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		double[] M = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		double[] N = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		double[] E = new double[] {0.4, 0.5, 10.0, 5.0, 4.0, 14.0}; //
+		double[] F = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		double[] L = new double[] {0.7, 0.55, 6.7, 8.8, 2.0, 7.7};
 			
 
-		for (int i=0;i<6;i++) {
-			if (arr[i]==0.0) arr[i]=0.001;
-			if (round((K[i]/arr[i]),4)>1.00) {
-				K[i]= 2 - (round((K[i]/arr[i]),4));
-			}
-			else {
-				K[i]= round((K[i]/arr[i]),4);
-			}
-			if (round((M[i]/arr[i]),4)>1.00) {
-				M[i]= 2 - (round((M[i]/arr[i]),4));
-			}
-			else {
-				M[i]= round((M[i]/arr[i]),4);
-			}
-			if (round((N[i]/arr[i]),4)>1.00) {
-				N[i]= 2 - (round((N[i]/arr[i]),4));
-			}
-			else {
-				N[i]= round((N[i]/arr[i]),4);
-			}
-			if (round((E[i]/arr[i]),4)>1.00) {
-				E[i]= 2 - (round((E[i]/arr[i]),4));
-			}
-			else {
-				E[i]= round((E[i]/arr[i]),4);
-			}
-			if (round((F[i]/arr[i]),4)>1.00) {
-				F[i]= 2 - (round((F[i]/arr[i]),4));
-			}
-			else {
-				F[i]= round((F[i]/arr[i]),4);
-			}
-			if (round((L[i]/arr[i]),4)>1.00) {
-				L[i]= 2 - (round((L[i]/arr[i]),4));
-			}
-			else {
-				L[i]= round((L[i]/arr[i]),4);
-			}
+		for (int i=0;i<percentageArr.length;i++) {
+			K[i]=percentSimilarityBetweenTwoDoubles(arr[i], K[i]);
+			M[i]=percentSimilarityBetweenTwoDoubles(arr[i], M[i]);
+			N[i]=percentSimilarityBetweenTwoDoubles(arr[i], N[i]);
+			E[i]=percentSimilarityBetweenTwoDoubles(arr[i], E[i]);
+			F[i]=percentSimilarityBetweenTwoDoubles(arr[i], F[i]);
+			L[i]=percentSimilarityBetweenTwoDoubles(arr[i], L[i]);
 		}
-		
+
 		double aveK = 0.0;
 		double aveM = 0.0;
 		double aveN = 0.0;
@@ -599,60 +652,34 @@ public class Letter {
 		double aveF = 0.0;
 		double aveL = 0.0;
 		
+		for (int i=0;i<percentageArr.length;i++) {
+			aveK+=K[i];
+			aveM+=M[i];
+			aveN+=N[i];
+			aveE+=E[i];
+			aveF+=F[i];
+			aveL+=L[i];
+		}
+		
+		aveK = round((aveK/percentageArr.length),2);
+		aveM = round((aveM/percentageArr.length),2);
+		aveN = round((aveN/percentageArr.length),2);
+		aveE = round((aveE/percentageArr.length),2);
+		aveF = round((aveF/percentageArr.length),2);
+		aveL = round((aveL/percentageArr.length),2);
 		
 		Map<Double, String> map = new HashMap<Double, String>();
 		
-		double[] d = new double[6];
-		
-		for (int i=0;i<5;i++) {
-			if (K[i]>500.0) K[i]=0;
-			aveK+=K[i];
-		}
-		aveK = round(aveK/6,2);
-		d[0] = aveK;
 		map.put(aveK, "K");
-		
-		for (int i=0;i<4;i++) {
-			if (M[i]>500.0) M[i]=0;
-			aveM+=M[i];
-		}
-		aveM = round(aveM/6,2);
-		d[1] = aveM;
 		map.put(aveM, "M");
-		
-		for (int i=0;i<4;i++) {
-			if (N[i]>500.0) N[i]=0;
-			aveN+=N[i];
-		}
-		aveN = round(aveN/6,2);
-		d[2] = aveN;
 		map.put(aveN, "N");
-		
-		for (int i=0;i<4;i++) {
-			if (E[i]>500.0) E[i]=0;
-			aveE+=E[i];
-		}
-		aveE = round(aveE/6,2);
-		d[3] = aveE;
 		map.put(aveE, "E");
-		
-		for (int i=0;i<4;i++) {
-			if (F[i]>500.0) F[i]=0;
-			aveF+=F[i];
-		}
-		aveF = round(aveF/6,2);
-		d[4] = aveF;
 		map.put(aveF, "F");
-		
-		for (int i=0;i<4;i++) {
-			if (L[i]>500.0) L[i]=0;
-			aveL+=L[i];
-		}
-		aveL = round(aveL/6,2);
-		d[5] = aveL;
 		map.put(aveL, "L");
-		
-		double highest = 0.0;
+
+		double highest=0.0;
+		double[] d = new double[] {aveK, aveM, aveN, aveE, aveF, aveL};
+
 		for (int i=0;i<d.length;i++) {
 			if (d[i]>highest) highest=d[i];
 		}
@@ -660,8 +687,68 @@ public class Letter {
 		letter = map.get(highest);
 		percentMatch = highest;
 	}
+
 	
 	
+	
+	
+	private void findExternalEdgeofLetter() {
+		for (int y=1;y<featureHeight-1;y++) {
+			for (int x=1;x<featureWidth-1;x++) {
+				if (featureIntArray[x][y]==0) {
+					if (featureIntArray[x-1][y]==1 || featureIntArray[x+1][y]==1 ||
+							featureIntArray[x][y-1]==1 || featureIntArray[x][y+1]==1) {
+						featureIntArray[x][y]=5;
+					}
+				}
+			}
+		}
+		for (int y=1;y<featureHeight-1;y++) {
+			for (int x=1;x<featureWidth-1;x++) {
+				if (featureIntArray[x][y]==0) {
+					
+					if (featureIntArray[x+1][y]==5 && featureIntArray[x][y+1]==5 &&
+							featureIntArray[x+1][y+1]==1) {
+						featureIntArray[x][y]=5;
+					}
+					else if (featureIntArray[x-1][y]==5 && featureIntArray[x][y+1]==5 &&
+							featureIntArray[x-1][y+1]==1) {
+						featureIntArray[x][y]=5;
+					}
+					else if (featureIntArray[x][y-1]==5 && featureIntArray[x-1][y]==5 &&
+							featureIntArray[x-1][y-1]==1) {
+						featureIntArray[x][y]=5;
+					}
+					else if (featureIntArray[x][y-1]==5 && featureIntArray[x+1][y]==5 &&
+							featureIntArray[x+1][y-1]==1) {
+						featureIntArray[x][y]=5;
+					}
+					
+				}
+			}
+		}
+	}
+
+	private double percentSimilarityBetweenTwoDoubles(double A, double B) {
+		double result=0.0;
+		if (A==0.0 && B==0.0) {
+			result = 1.0;
+		}
+		else if (B==0.0) {
+			result = 0.0;
+		}
+		else if (A/B<1) {
+			result = round((A/B),2);
+		}
+		else if (A/B>1) {
+			result = round((B/A),2);
+		}
+		else if (A/B==1.0) {
+			result = 1.0;
+		}
+
+		return result;
+	}
 	
 	private void loopDetection() {
 		
@@ -1029,12 +1116,7 @@ public class Letter {
 
 	}
 	
-	
-	
-	
-	
-	
-	
+
 	
 	/*
 	 * Find outer-most X, coordinates of the feature.  Used to box Features.
@@ -1138,6 +1220,26 @@ public class Letter {
 				", BottomUpper dXdY: " + bottomUpper_dXdY +
 				", BottomLower dXdY: " + bottomLower_dXdY
 				);
+		
+		System.out.println("Column%: " + column_Percentage
+				+ ", Flat%: " + flat_Percentage
+				+ ", SharpAngle%: " + sharp_Percentage
+				+ ", CurvedAngle%: " + curved_Percentage
+				+ ", Corner%: " + corner_Percentage
+		);
+		
+		System.out.println("First Section(t,b,l,r): " + firstQuarter[0] + ", " + firstQuarter[1] + ", " +
+				 + firstQuarter[2] + ", " + firstQuarter[3] +
+				 "\nSecond Section(t,b,l,r): " + secondQuarter[0] + ", " + secondQuarter[1] + ", " +
+						 + secondQuarter[2] + ", " + secondQuarter[3] +
+				 "\nThird Section(t,b,l,r): " + threeQuarter[0] + ", " + threeQuarter[1] + ", " +
+						 + threeQuarter[2] + ", " + threeQuarter[3] +	
+				 "\nFourth Section(t,b,l,r): " + fourthQuarter[0] + ", " + fourthQuarter[1] + ", " +
+						 + fourthQuarter[2] + ", " + fourthQuarter[3]
+		);
+
+		System.out.println(letter + ", " + percentMatch + "%");
+		System.out.print("\n");
 	}
 	
 	private void printIntegerArray() {
@@ -1149,6 +1251,12 @@ public class Letter {
 		}	
 	}
 	
+	private void printDirectionList() {
+		for (char ch : directionLL) {
+			System.out.print(ch + ",");
+		}
+		System.out.println();
+	}
 	
 }
 
