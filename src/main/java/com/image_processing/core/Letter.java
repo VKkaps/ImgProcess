@@ -82,12 +82,14 @@ public class Letter {
 		
 		findExternalEdgeofLetter();
 		generateDirectionList();
+		//printDirectionList();
 		newClassify();
 		
 		//classify();
-		//identifyLetter();
-		
-		printLetterInfo();
+		identifyLetter();
+		System.out.println(percentMatch);
+		//sectionPrint();
+		//printLetterInfo();
 		//printIntegerArray();
 	}
 
@@ -130,7 +132,6 @@ public class Letter {
 		for (int i=0;i<circularArr.size();i++) {
 			directionLL.add(circularArr.searchByIndex(i).item);
 		}
-		printDirectionList();
 	}
 			
 	private void newClassify() {
@@ -158,7 +159,7 @@ public class Letter {
 		for (int i=0;i<fourthSection.length;i++) {
 			fourthSection[i]=directionLL.get(i+thirdSection.length);
 		}
-		System.out.println();
+	//	System.out.println();
 		
 		firstQuarter = findDirectionAve(firstSection);
 		secondQuarter = findDirectionAve(secondSection);
@@ -200,10 +201,12 @@ public class Letter {
 	}
 	
 	private void compareC() {
-		double[] first = new double[] {0.327, 0.114, 0.0, 0.56};
-		double[] second = new double[] {0.146, 0.386, 0.449, 0.021};
-		double[] third = new double[] {0.146, 0.386, 0.449, 0.021};
-		double[] fourth = new double[] {0.142, 0.397, 0.439, 0.023};
+		double[] first = new double[] {0.313,	0.126,	0.0,	0.494};
+		double[] second = new double[] {0.0,	0.312,	0.313,	0.299};
+		double[] third = new double[] {0.0,	0.312,	0.313,	0.299};
+		double[] fourth = new double[] {0.0,	0.323,	0.308,	0.293};
+		
+
 		
 		double[] resultOne = new double[4];
 		double[] resultTwo = new double[4];
@@ -567,7 +570,7 @@ public class Letter {
 			if (0.0<=leftUpper_dXdY && leftUpper_dXdY<0.45 && 
 					-0.45<=leftLower_dXdY && leftLower_dXdY<=0.0) {
 
-				checkMatch(percentageArr);
+				//checkMatch(percentageArr);
 				
 				//letter = "leftColumn";
 			}
@@ -615,7 +618,6 @@ public class Letter {
 			// 2 total:
 			// B and 8
 			// potentially g...
-			printLetterInfo();
 			if (0.0<=leftUpper_dXdY && leftUpper_dXdY<0.4 && 
 					-0.4<=leftLower_dXdY && leftLower_dXdY<=0.0) {
 				letter = "B";
@@ -1240,6 +1242,18 @@ public class Letter {
 
 		System.out.println(letter + ", " + percentMatch + "%");
 		System.out.print("\n");
+	}
+	
+	private void sectionPrint() {
+		System.out.println(firstQuarter[0] + ", " + firstQuarter[1] + ", " +
+				 + firstQuarter[2] + ", " + firstQuarter[3] +
+				 "\n" + secondQuarter[0] + ", " + secondQuarter[1] + ", " +
+						 + secondQuarter[2] + ", " + secondQuarter[3] +
+				 "\n" + threeQuarter[0] + ", " + threeQuarter[1] + ", " +
+						 + threeQuarter[2] + ", " + threeQuarter[3] +	
+				 "\n" + fourthQuarter[0] + ", " + fourthQuarter[1] + ", " +
+						 + fourthQuarter[2] + ", " + fourthQuarter[3]
+		);
 	}
 	
 	private void printIntegerArray() {
