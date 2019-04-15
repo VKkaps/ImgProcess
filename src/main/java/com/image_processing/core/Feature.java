@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+
+import com.image_processing.letters.EnglishAlphabet.PercentageCheck;;
 
 public class Feature {
 
@@ -42,12 +42,15 @@ public class Feature {
 	
 	private HashMap<Integer,double[]> sectionHMap = new HashMap<Integer,double[]>();
 	
+	double percentStraight=0.0;
+	
 	
 	double curved_Percentage=0.0;
 	double sharp_Percentage=0.0;
 	double column_Percentage=0.0;
 	double flat_Percentage=0.0;
 	double corner_Percentage=0.0;
+	double fourFive_Percentage=0.0;
 	
 	double[] percentageArr = null;
 	
@@ -90,11 +93,11 @@ public class Feature {
 		
 		
 		//printDirectionList();
-		printFeatureInfo();
+		//printFeatureInfo();
 		//printIntegerArray();
 		//sectionPrint();
 		
-		//System.out.println(letter);
+		System.out.println(letter);
 	}
 
 	
@@ -104,218 +107,125 @@ public class Feature {
 		if (numOfLoops==0) {
 			// 43 total
 			
-			// left column
-			// K, h, k, m, n, r
-			// M, N, i, l, I, E, F, L, H
-			// 
 			
-			if (-0.25<=leftUpper_dXdY && leftUpper_dXdY<0.45 && 
-					-0.45<=leftLower_dXdY && leftLower_dXdY<=0.33) {
+			char[] chArr = new char[4];
+			chArr = PercentageCheck.zeroLoop(sectionHMap);
 
-				char[] chArr = new char[4];
-				chArr = PercentageCheck.zeroLoop_leftColumn(sectionHMap);
-
-				for (int i=1;i<chArr.length;i++) {
-					percentMatch.append(chArr[i]);
-				}
-	
-				letter = chArr[0];
-				
-				
+			for (int i=1;i<chArr.length;i++) {
+				percentMatch.append(chArr[i]);
 			}
 			
 			
-			// c-shaped left side
-			// C, G, c
-			if (-0.8<=leftUpper_dXdY && leftUpper_dXdY<-0.40 && 
-					0.35<=leftLower_dXdY && leftLower_dXdY<=0.8) {
+			letter = chArr[0];
 
-				char[] chArr = new char[4];
-				chArr = PercentageCheck.zeroLoop_cCurve(sectionHMap);
-
-				for (int i=1;i<chArr.length;i++) {
-					percentMatch.append(chArr[i]);
-				}
-	
-				letter = chArr[0];
-				
-			}
-			
-			// 70 degree
-			// V, W, v , w
-			if (0.16<=leftUpper_dXdY && leftUpper_dXdY<0.45 && 
-					0.12<=leftLower_dXdY && leftLower_dXdY<=0.45 ||
-					-0.45<=rightUpper_dXdY && rightUpper_dXdY<-0.17 && 
-					-0.45<=rightLower_dXdY && rightLower_dXdY<=-0.18) {
-				char[] chArr = new char[4];
-				chArr = PercentageCheck.zeroLoop_vEdge(sectionHMap);
-				for (int i=1;i<chArr.length;i++) {
-					percentMatch.append(chArr[i]);
-				}
-	
-				letter = chArr[0];
-			}
-			
-			
-		
-			if (true) {
-				char[] chArr = new char[4];
-				chArr = PercentageCheck.zeroLoop_misc(sectionHMap);
-				for (int i=1;i<chArr.length;i++) {
-					percentMatch.append(chArr[i]);
-				}
-	
-				letter = chArr[0];
-			}
-			
-			
 		}
 		else if (numOfLoops==1) {
 			
-			// 18 total
-			//c-shaped left side
-			// O, e, o, 6, 0, Q
-			if (-0.8<=leftUpper_dXdY && leftUpper_dXdY<-0.45 && 
-					0.35<=leftLower_dXdY && leftLower_dXdY<=2.0) {
+			char[] chArr = new char[4];
+			chArr = PercentageCheck.oneLoop(sectionHMap);
 
-				char[] chArr = new char[4];
-				chArr = PercentageCheck.oneLoop_cCurve(sectionHMap);
-				for (int i=1;i<chArr.length;i++) {
-					percentMatch.append(chArr[i]);
-				}
-	
-				letter = chArr[0];
+			for (int i=1;i<chArr.length;i++) {
+				percentMatch.append(chArr[i]);
 			}
 			
-			//left column
-			// D, P, R, b, p
-			
-			if (-0.41<=leftUpper_dXdY && leftUpper_dXdY<0.45 && 
-					-0.45<=leftLower_dXdY && leftLower_dXdY<=0.33) {
 
-				char[] chArr = new char[4];
-				chArr = PercentageCheck.oneLoop_leftColumn(sectionHMap);
+			letter = chArr[0];
 
-				for (int i=1;i<chArr.length;i++) {
-					percentMatch.append(chArr[i]);
-				}
-	
-				letter = chArr[0];
-				
-				
-			}
-			
-			//right column
-			// d, a,q
-			if (-0.2<=rightUpper_dXdY && rightUpper_dXdY<0.4 && 
-					-0.2<=rightLower_dXdY && rightLower_dXdY<=0.2) {
-				char[] chArr = new char[4];
-				chArr = PercentageCheck.oneLoop_rightColumn(sectionHMap);
-
-				for (int i=1;i<chArr.length;i++) {
-					percentMatch.append(chArr[i]);
-				}
-	
-				letter = chArr[0];
-				
-				
-			}
-			
-			
-			//left rising edge
-			// A, 4
-			if (-0.45<=leftUpper_dXdY && leftUpper_dXdY<-0.25 && 
-					-0.45<=leftLower_dXdY && leftLower_dXdY<=-0.25) {
-				letter = '_';
-
-			}
-			
-			// misc...
-			// g, 9
-			
 		}
 		else if (numOfLoops==2) {
 			// 2 total:
 			// B and 8
 			// potentially g...
-			if (0.0<=leftUpper_dXdY && leftUpper_dXdY<0.4 && 
-					-0.4<=leftLower_dXdY && leftLower_dXdY<=0.0) {
-				letter = 'B';
+			char[] chArr = new char[4];
+			chArr = PercentageCheck.twoLoop(sectionHMap);
+
+			for (int i=1;i<chArr.length;i++) {
+				percentMatch.append(chArr[i]);
 			}
-			else letter = 'B';
+
+
+			letter = chArr[0];
 		}
-		
-		
 	}
 	
+	
 	private void edgeClassifier() {
-		
 
 		int c_curve = 0;
 		int A_edge = 0;
-		int flat = 0;
-		int column = 0;
-		int corner = 0;
 		int fourFive = 0;
-
-		// flat check
-		for (int i=0;i<directionLL.size()-4;i++) {
-			
-			
+		int corner = 0;
+		
+		
+		int rowMargin = featureWidth/4;
+		int colMargin = featureHeight/4;
+		
+		int rCount=0;
+		int count=0;
+		// right flat check
+		for (int i=0;i<directionLL.size();i++) {
 			if (directionLL.get(i)=='r') {
-				if (directionLL.get(i+1)=='r') {
-					if (directionLL.get(i+2)=='r') {
-						if (directionLL.get(i+3)=='r') {
-							if (directionLL.get(i+4)=='r') {
-								flat++;
-								i+=5;
-							}
-						}
-					}
-				}
+				count++;
 			}
-			else if (directionLL.get(i)=='l') {
-				if (directionLL.get(i+1)=='l') {
-					if (directionLL.get(i+2)=='l') {
-						if (directionLL.get(i+3)=='l') {
-							if (directionLL.get(i+4)=='l') {
-								flat++;
-								i+=5;
-							}
-						}
-					}
+			else if (directionLL.get(i)!='r') {
+				if (count>=rowMargin) {
+					rCount+=count;
 				}
+				count=0;
 			}
 		}
-		
-		//column check
-		for (int i=0;i<circularArr.size()-4;i++) {
+
+
+		int lCount=0;
+		count=0;
+		// left flat check
+		for (int i=0;i<directionLL.size();i++) {
+			if (directionLL.get(i)=='l') {
+				count++;
+			}
+			else if (directionLL.get(i)!='l') {
+				if (count>=rowMargin) {
+					lCount+=count;
+				}
+				count=0;
+			}
+		}
+
+
+		int tCount=0;
+		count=0;
+		// top column check
+		for (int i=0;i<directionLL.size();i++) {
 			if (directionLL.get(i)=='t') {
-				if (directionLL.get(i+1)=='t') {
-					if (directionLL.get(i+2)=='t') {
-						if (directionLL.get(i+3)=='t') {
-							if (directionLL.get(i+4)=='t') {
-								column++;
-								i+=5;
-							}
-						}
-					}
-				}
+				count++;
 			}
-			else if (directionLL.get(i)=='b') {
-				if (directionLL.get(i+1)=='b') {
-					if (directionLL.get(i+2)=='b') {
-						if (directionLL.get(i+3)=='b') {
-							if (directionLL.get(i+4)=='b') {
-								column++;
-								i+=5;
-							}
-						}
-					}
+			else if (directionLL.get(i)!='t') {
+				if (count>=colMargin) {
+					tCount+=count;
 				}
+				count=0;
 			}
 		}
-		
+
+
+		int bCount=0;
+		count=0;
+		// bottom column check
+		for (int i=0;i<directionLL.size();i++) {
+			if (directionLL.get(i)=='b') {
+				count++;
+			}
+			else if (directionLL.get(i)!='b') {
+				if (count>=colMargin) {
+					bCount+=count;
+				}
+				count=0;
+			}
+		}
+
+		double colPercentage = (double)(tCount+bCount)/(double)featureHeight;
+		double rowPercentage = (double)(lCount+rCount)/(double)featureWidth;
+
 		//A-edge
 		for (int i=0;i<circularArr.size()-4;i++) {
 			if (directionLL.get(i)=='r') {
@@ -331,9 +241,7 @@ public class Feature {
 						}
 					}
 				}
-			}
-			else if (directionLL.get(i)=='r') {
-				if (directionLL.get(i+1)=='b') {
+				else if (directionLL.get(i+1)=='b') {
 					if (directionLL.get(i+2)=='b') {
 						if (directionLL.get(i+3)=='b') {
 							if (directionLL.get(i+4)=='r') {
@@ -341,6 +249,32 @@ public class Feature {
 							}
 						}
 						else if (directionLL.get(i+3)=='r') {
+							A_edge++;
+						}
+					}
+				}
+			}
+			else if (directionLL.get(i)=='l') {
+				if (directionLL.get(i+1)=='t') {
+					if (directionLL.get(i+2)=='t') {
+						if (directionLL.get(i+3)=='t') {
+							if (directionLL.get(i+4)=='l') {
+								A_edge++;
+							}
+						}
+						else if (directionLL.get(i+3)=='l') {
+							A_edge++;
+						}
+					}
+				}
+				else if (directionLL.get(i+1)=='b') {
+					if (directionLL.get(i+2)=='b') {
+						if (directionLL.get(i+3)=='b') {
+							if (directionLL.get(i+4)=='l') {
+								A_edge++;
+							}
+						}
+						else if (directionLL.get(i+3)=='l') {
 							A_edge++;
 						}
 					}
@@ -354,6 +288,18 @@ public class Feature {
 				if (directionLL.get(i+1)=='r') {
 					if (directionLL.get(i+2)=='r') {
 						if (directionLL.get(i+3)=='r') {
+							if (directionLL.get(i+4)=='t') {
+								c_curve++;
+							}
+						}
+						else if (directionLL.get(i+3)=='t') {
+							c_curve++;
+						}
+					}
+				}
+				else if (directionLL.get(i+1)=='l') {
+					if (directionLL.get(i+2)=='l') {
+						if (directionLL.get(i+3)=='l') {
 							if (directionLL.get(i+4)=='t') {
 								c_curve++;
 							}
@@ -377,8 +323,19 @@ public class Feature {
 						}
 					}
 				}
+				else if (directionLL.get(i+1)=='l') {
+					if (directionLL.get(i+2)=='l') {
+						if (directionLL.get(i+3)=='l') {
+							if (directionLL.get(i+4)=='b') {
+								c_curve++;
+							}
+						}
+						else if (directionLL.get(i+3)=='b') {
+							c_curve++;
+						}
+					}
+				}
 			}
-			
 		}
 		
 		
@@ -447,7 +404,7 @@ public class Feature {
 		}
 		
 		//45 degree angle check
-		for (int i=0;i<circularArr.size()-3;i++) {
+		for (int i=0;i<directionLL.size()-3;i++) {
 			
 			if (directionLL.get(i)=='r') {
 				if (directionLL.get(i+1)=='t') {
@@ -475,24 +432,98 @@ public class Feature {
 			}
 		}
 		
+		//corner check
+		for (int i=0;i<directionLL.size()-3;i++) {
+			
+			if (directionLL.get(i)=='r') {
+				if (directionLL.get(i+1)=='r') {
+					if (directionLL.get(i+2)=='t') {
+						if (directionLL.get(i+3)=='t') {
+							corner++;
+						}
+					}
+					else if (directionLL.get(i+2)=='b') {
+						if (directionLL.get(i+3)=='b') {
+							corner++;
+						}
+					}
+				}
+			}
+			else if (directionLL.get(i)=='l') {
+				if (directionLL.get(i+1)=='l') {
+					if (directionLL.get(i+2)=='t') {
+						if (directionLL.get(i+3)=='t') {
+							corner++;
+						}
+					}
+					else if (directionLL.get(i+2)=='b') {
+						if (directionLL.get(i+3)=='b') {
+							corner++;
+						}
+					}
+				}
+			}
+			else if (directionLL.get(i)=='t') {
+				if (directionLL.get(i+1)=='t') {
+					if (directionLL.get(i+2)=='r') {
+						if (directionLL.get(i+3)=='r') {
+							corner++;
+						}
+					}
+					else if (directionLL.get(i+2)=='l') {
+						if (directionLL.get(i+3)=='l') {
+							corner++;
+						}
+					}
+				}
+			}
+			else if (directionLL.get(i)=='b') {
+				if (directionLL.get(i+1)=='b') {
+					if (directionLL.get(i+2)=='r') {
+						if (directionLL.get(i+3)=='r') {
+							corner++;
+						}
+					}
+					else if (directionLL.get(i+2)=='l') {
+						if (directionLL.get(i+3)=='l') {
+							corner++;
+						}
+					}
+				}
+			}
+		}
 		
-		double ctemp = ((double) c_curve / (double) directionLL.size())*100 ;
-		double Atemp = ((double) A_edge / (double) directionLL.size())*100 ;
-		double ftemp = ((double) flat / (double) directionLL.size())*100 ;
-		double coltemp = ((double) column / (double) directionLL.size())*100 ;
-		double cornertemp = ((double) corner / (double) directionLL.size())*100 ;
+
+		double Atemp = (double)(A_edge*5) / (double) directionLL.size();
+		double Ctemp = (double)(c_curve*5) / (double) directionLL.size();
+		double fourFivetemp = (double)(fourFive*3) / (double) directionLL.size();
+		double cornertemp = (double)(corner*4) / (double) directionLL.size();
+
 		
-		curved_Percentage = round(ctemp,2);
+		
+		curved_Percentage = round(Ctemp,2);
 		sharp_Percentage=round(Atemp,2);
-		column_Percentage= round(coltemp,2);
-		flat_Percentage = round(ftemp,2);
+		fourFive_Percentage = round(fourFivetemp,2);
+		column_Percentage= round(colPercentage,2);
+		flat_Percentage = round(rowPercentage,2);
 		corner_Percentage = round(cornertemp,2);
 		
+//		System.out.println(
+//				"Curved: " + curved_Percentage + 
+//				"\nSharp: " + sharp_Percentage + 
+//				"\n45: " + fourFive_Percentage + 
+//				"\nCorner: " + corner_Percentage +
+//				"\nColumn: " + column_Percentage + 
+//				"\nFlat: " + flat_Percentage
+//				);
+		
+			
 		percentageArr = new double[] {curved_Percentage, sharp_Percentage, 
-				flat_Percentage, column_Percentage, corner_Percentage}; 
+				fourFive_Percentage, corner_Percentage, flat_Percentage, column_Percentage}; 
+	
+		sectionHMap.put(4, percentageArr);
 	}
 
-	
 	
 	private void breakDirectionListIntoFourSections() {
 		int size = directionLL.size()/4;
@@ -519,8 +550,7 @@ public class Feature {
 		for (int i=0;i<fourthSection.length;i++) {
 			fourthSection[i]=directionLL.get(i+firstSection.length+secondSection.length+thirdSection.length);
 		}
-	//	System.out.println();
-		
+
 		firstQuarter = findDirectionAve(firstSection);
 		secondQuarter = findDirectionAve(secondSection);
 		threeQuarter = findDirectionAve(thirdSection);
@@ -674,27 +704,6 @@ public class Feature {
 		}
 	}
 
-	private double percentSimilarityBetweenTwoDoubles(double A, double B) {
-		double result=0.0;
-		if (A==0.0 && B==0.0) {
-			result = 1.0;
-		}
-		else if (B==0.0) {
-			result = 0.0;
-		}
-		else if (A/B<1) {
-			result = round((A/B),2);
-		}
-		else if (A/B>1) {
-			result = round((B/A),2);
-		}
-		else if (A/B==1.0) {
-			result = 1.0;
-		}
-
-		return result;
-	}
-	
 	private void loopDetection() {
 		
 		copy = AbstractProcessImage.getFeatureAsIntArray(boundaryArr);
@@ -718,6 +727,7 @@ public class Feature {
 		int middleOfLoop1=0;
 		int middleOfLoop2=0;
 		int middleOfLoop3=0;
+		int middleOfLoop4=0;
 		
 		if (verticalTransitionPoints.size()==1) {
 			middleOfLoop1=verticalTransitionPoints.get(0)-1;
@@ -779,6 +789,51 @@ public class Feature {
 					hasLoop=true;
 					numOfLoops++;
 					upperOrLowerLoop((middleOfLoop2 + middleOfLoop3)/2);
+				}
+			}
+
+		}
+		
+		else if (verticalTransitionPoints.size()==4) {
+			middleOfLoop1=verticalTransitionPoints.get(0)-1;
+			middleOfLoop2=verticalTransitionPoints.get(1)-1;
+			middleOfLoop3=verticalTransitionPoints.get(2)-1;
+			middleOfLoop4=verticalTransitionPoints.get(3)-1;
+			
+			if (loopDetector(middle, middleOfLoop1,copy)) {
+				hasLoop=true;
+				numOfLoops++;
+				upperOrLowerLoop(middleOfLoop1/2);
+			}
+			copy = AbstractProcessImage.getFeatureAsIntArray(boundaryArr);
+			
+
+			if (copy[middle][middleOfLoop2-1]!=1) {
+				if (loopDetector(middle, middleOfLoop2,copy)) {
+					hasLoop=true;
+					numOfLoops++;
+					upperOrLowerLoop((middleOfLoop1 + middleOfLoop2)/2);
+				}
+			}
+			copy = AbstractProcessImage.getFeatureAsIntArray(boundaryArr);
+			
+
+			if (copy[middle][middleOfLoop3-1]!=1) {
+				if (loopDetector(middle, middleOfLoop3,copy)) {
+					hasLoop=true;
+					numOfLoops++;
+					upperOrLowerLoop((middleOfLoop2 + middleOfLoop3)/2);
+				}
+			}
+			copy = AbstractProcessImage.getFeatureAsIntArray(boundaryArr);
+			
+
+			
+			if (copy[middle][middleOfLoop4-1]!=1) {
+				if (loopDetector(middle, middleOfLoop4,copy)) {
+					hasLoop=true;
+					numOfLoops++;
+					upperOrLowerLoop((middleOfLoop3 + middleOfLoop4)/2);
 				}
 			}
 
@@ -1148,6 +1203,7 @@ public class Feature {
 	    return bd.doubleValue();
 	}
 
+
 	private void printFeatureInfo() {
 		System.out.println(
 				"\nFeatureWidth: " + featureWidth +
@@ -1166,11 +1222,12 @@ public class Feature {
 				", BottomLower dXdY: " + bottomLower_dXdY
 				);
 		
-		System.out.println("Column%: " + column_Percentage
+		System.out.println("Curved%: " + curved_Percentage
+				+ ", Sharp%: " + sharp_Percentage
 				+ ", Flat%: " + flat_Percentage
-				+ ", SharpAngle%: " + sharp_Percentage
-				+ ", CurvedAngle%: " + curved_Percentage
+				+ ", Column%: " + column_Percentage
 				+ ", Corner%: " + corner_Percentage
+				+ ", 45deg%: " + fourFive_Percentage
 		);
 		
 		System.out.println("First Section(t,b,l,r): " + firstQuarter[0] + ", " + firstQuarter[1] + ", " +
@@ -1195,7 +1252,10 @@ public class Feature {
 				 "\n" + threeQuarter[0] + ", " + threeQuarter[1] + ", " +
 						 + threeQuarter[2] + ", " + threeQuarter[3] +	
 				 "\n" + fourthQuarter[0] + ", " + fourthQuarter[1] + ", " +
-						 + fourthQuarter[2] + ", " + fourthQuarter[3]
+						 + fourthQuarter[2] + ", " + fourthQuarter[3] +
+				 "\n" + percentageArr[0] + ", " + percentageArr[1] + ", " +
+						 + percentageArr[2] + ", " + percentageArr[3] + ", " +
+						 + percentageArr[4] + ", " + percentageArr[5]
 		);
 	}
 	
