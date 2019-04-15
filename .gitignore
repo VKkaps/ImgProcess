@@ -10,7 +10,9 @@ src/main/java/testing/
 src/main/java/com/database/
 timingDB/
 lettersDB/
-EnglishAlphabet/
+LowerLetters/
+UpperLetters/
+Numbers/
 *.sql
 
 # Thumbnail cache files
