@@ -9,9 +9,9 @@ derbyDB/
 src/main/java/com/database/
 timingDB/
 lettersDB/
-/LowerLetters/
-/UpperLetters/
-/Numbers/
+LowerLetters/
+UpperLetters/
+Numbers/
 *.sql
 
 # Thumbnail cache files
