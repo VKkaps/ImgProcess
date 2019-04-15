@@ -6,13 +6,12 @@
 .DS_Store
 Desktop.ini
 derbyDB/
-src/main/java/testing/
 src/main/java/com/database/
 timingDB/
 lettersDB/
-LowerLetters/
-UpperLetters/
-Numbers/
+/LowerLetters/
+/UpperLetters/
+/Numbers/
 *.sql
 
 # Thumbnail cache files
