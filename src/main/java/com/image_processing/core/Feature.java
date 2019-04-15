@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.image_processing.letters.EnglishAlphabet.PercentageCheck;;
+import com.image_processing.letters.EnglishAlphabet.AlphaNumericPercentageCheck;;
 
 public class Feature {
 
@@ -22,6 +22,7 @@ public class Feature {
 	
 	private BufferedImage featureImage = null;  //Auxilary - used to save Feature jpg image to a absolute file location
 
+	
 	//Loop Detection
 	private Boolean hasLoop = false;
 	private Boolean hasUpperLoop = false;
@@ -110,7 +111,7 @@ public class Feature {
 			
 			
 			char[] chArr = new char[4];
-			chArr = PercentageCheck.zeroLoop(sectionHMap);
+			chArr = AlphaNumericPercentageCheck.zeroLoop(sectionHMap);
 
 			for (int i=1;i<chArr.length;i++) {
 				percentMatch.append(chArr[i]);
@@ -123,7 +124,7 @@ public class Feature {
 		else if (numOfLoops==1) {
 			
 			char[] chArr = new char[4];
-			chArr = PercentageCheck.oneLoop(sectionHMap);
+			chArr = AlphaNumericPercentageCheck.oneLoop(sectionHMap);
 
 			for (int i=1;i<chArr.length;i++) {
 				percentMatch.append(chArr[i]);
@@ -138,7 +139,7 @@ public class Feature {
 			// B and 8
 			// potentially g...
 			char[] chArr = new char[4];
-			chArr = PercentageCheck.twoLoop(sectionHMap);
+			chArr = AlphaNumericPercentageCheck.twoLoop(sectionHMap);
 
 			for (int i=1;i<chArr.length;i++) {
 				percentMatch.append(chArr[i]);
