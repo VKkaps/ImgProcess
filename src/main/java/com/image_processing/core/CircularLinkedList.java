@@ -24,6 +24,7 @@ package com.image_processing.core;
  * @author Deepak
  */
 public class CircularLinkedList<E> {
+	
 
 	/* Head is needed to keep track of first node */
 	private Node<E> head;

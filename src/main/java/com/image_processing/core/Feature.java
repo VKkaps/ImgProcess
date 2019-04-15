@@ -22,6 +22,7 @@ public class Feature {
 	
 	private BufferedImage featureImage = null;  //Auxilary - used to save Feature jpg image to a absolute file location
 
+	//Loop Detection
 	private Boolean hasLoop = false;
 	private Boolean hasUpperLoop = false;
 	private Boolean hasLowerLoop = false;

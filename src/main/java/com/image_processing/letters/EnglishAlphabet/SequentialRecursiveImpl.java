@@ -40,6 +40,7 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 	private int featureWidth = 0;
 	private int featureHeight = 0;
 	
+	
 	private double[] topViewPercentages;
 	private double[] bottomViewPercentages;
 	private double[] rightViewPercentages;
