@@ -27,6 +27,8 @@ import com.image_processing.letters.EnglishAlphabet.SequentialRecursiveImpl;
 @MultipartConfig
 public class ProcessImageServlet extends HttpServlet {
 	
+	private String str = null;
+	
     /**
 	 * 
 	 */
@@ -38,16 +40,26 @@ public class ProcessImageServlet extends HttpServlet {
         BufferedImage imBuff = ImageIO.read(fileContent);
 
         // Choose implementation here
-		new SequentialRecursiveImpl(imBuff).boxFeaturesInImage(imBuff);
+        SequentialRecursiveImpl s = new SequentialRecursiveImpl(imBuff);
+		s.boxFeaturesInImage();
+		str = s.getIdentifiedText();
 
-     
         String base64String = encodeToString(imBuff, "jpg");
         response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
-        out.append(base64String);
-        out.close();
+        PrintWriter out1 = response.getWriter();
+        out1.append(base64String);
+        out1.close();
 	}
 	
+	public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException  {
+
+        res.setContentType("text/html");
+        PrintWriter out1 = res.getWriter();
+        out1.append(str);
+        out1.close();
+	}
+	
+
 	public static String encodeToString(BufferedImage image, String type) {
         String imageString = null;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

@@ -48,12 +48,7 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 	
 	private int[] i;
 	
-	private static String[] numbers = new String[] {"One", "Two", "Three", "Four", "Five",
-	"Six", "Seven", "Eight", "Nine", "Zero"};
-	
-	private static String[] alphabet = new String[] {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"
-			, "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
-
+	private StringBuilder str = new StringBuilder();
 	
 	int index=0;
 
@@ -69,6 +64,7 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 		initializeNeighborPixels();
 		sortAndInitQueues();
 		findFeatures();
+		identifyLetters();
 		index=0;
 	}
 
@@ -240,11 +236,19 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 	//    System.out.println("findFeatures execution time: " + findFeaturesTime  + " ms");
 	}
 	
-	private void findAverage() {
-		
+	
+	/*
+	 * Iterate thru each Feature that was found and determine which letter it is
+	 * 
+	 * */
+	private void identifyLetters() {
+		for (int i=0;i<mapFeatures.size();i++) {
+			str.insert(i, mapFeatures.get(i).identifyLetter());
+		}
 	}
 	
 	
+
 	/*
 	 * Recursive PreOrder Traversal of noticablePixels.  Essentially builds Features via recursion.
 	 * If a current noticable pixel has a neighboring noticable pixel add current 
@@ -299,8 +303,8 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 	
 	////////////GETTERS/////////////
 
-	public void boxFeaturesInImage(BufferedImage b) {
-		boxFeatures(b, mapFeatures);
+	public void boxFeaturesInImage() {
+		boxFeatures(mapFeatures);
 	}
 
 	public int getFindTime() {
@@ -353,6 +357,11 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 	
 	public int[] getAllChangeAndTransitions() {
 		return i;
+	}
+	
+	
+	public String getIdentifiedText() {
+		return str.toString();
 	}
 	
 }

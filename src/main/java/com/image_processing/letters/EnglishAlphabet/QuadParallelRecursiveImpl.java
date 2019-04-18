@@ -473,10 +473,10 @@ public class QuadParallelRecursiveImpl extends AbstractProcessImage{
 	////////////GETTERS/////////////
 
 	public void boxFeaturesInImage(BufferedImage b) {
-		boxFeatures(b, mapFeatures1);
-		boxFeatures(b, mapFeatures2);
-		boxFeatures(b, mapFeatures3);
-		boxFeatures(b, mapFeatures4);
+		boxFeatures(mapFeatures1);
+		boxFeatures(mapFeatures2);
+		boxFeatures(mapFeatures3);
+		boxFeatures(mapFeatures4);
 	}
 
 	private void findAverageFeatureSize() {

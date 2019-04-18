@@ -45,10 +45,13 @@ public class Pixel implements Comparable<Pixel>{
 	}
 	
 	
-////////////////////////Methods///////////////////////////////
+	////////////////////////////Methods///////////////////////////////
 	
 	
-	// Print Pixel information to console.  For troubleshooting purposes.
+	/*
+	 *  Print Pixel information to console.  For troubleshooting purposes.
+	 *  
+	 *  */
 	public void printPixelRGB(){
 		System.out.println("[" + xCoor + "," + yCoor + "], " + "(R" + rVal + ", G" + gVal + ", B" + bVal + ") "
 				+ "rgb Ave: " + pixelRGBAverage);

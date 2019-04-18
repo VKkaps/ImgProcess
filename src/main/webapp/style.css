@@ -8,6 +8,14 @@ canvas {
   color: #fff !important;
 }
 
+p {
+  width: 100%;
+  height: 100%;
+  padding: 40px;
+  border: 4px solid #10AAEC;
+  border-radius: 8px;
+  word-wrap: break-word;
+}
 
 
 

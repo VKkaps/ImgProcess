@@ -91,6 +91,7 @@ public class Feature {
 		generateDirectionList();
 		breakDirectionListIntoFourSections();
 		edgeClassifier();
+		identifyColumnPercentage();
 		identifyLetter();
 		
 		
@@ -99,13 +100,12 @@ public class Feature {
 		//printIntegerArray();
 		//sectionPrint();
 		
-		System.out.println(letter);
+		System.out.print(percentMatch +  " ");
 	}
 
 	
-	private void identifyLetter() {
+	public char identifyLetter() {
 
-		
 		if (numOfLoops==0) {
 			// 43 total
 			
@@ -148,7 +148,107 @@ public class Feature {
 
 			letter = chArr[0];
 		}
+		
+		if (percentMatch.charAt(2)<7) letter='_';
+		return letter;
 	}
+	
+	
+	
+	private void identifyColumnPercentage() {
+		
+		//char - 't' or 'b'
+		//Integer[] (0L) (1R)
+//		HashMap<Character,Integer[]> verticalGradientHmap = new HashMap<Character,Integer[]>();
+//		ArrayList<Integer[]> curveList = new ArrayList<Integer[]>();
+//		ArrayList<Integer[]> bList = new ArrayList<Integer[]>();
+//		char startChar = '_';
+//		Integer[] temp = new Integer[]{0,0,0};
+//		
+//		for (int i=0;i<directionLL.size();i++) {
+//			if (directionLL.get(i)=='t' || directionLL.get(i)=='b') {
+//				startChar = directionLL.get(i);
+//				break;
+//			}
+//		}
+//		
+//		int count=0;
+//		
+//		for (int i=0;i<directionLL.size();i++) {
+//			if (directionLL.get(i)=='t' || directionLL.get(i)=='b') {
+//				count++;
+//				if (directionLL.get(i)=='t' && startChar=='b') {
+//					startChar = 't';
+//					temp[2]=count;
+//					curveList.add(temp);
+//					temp = new Integer[]{0,0,0};
+//					count=0;
+//				}
+//				else if (directionLL.get(i)=='b' && startChar=='t') {
+//					startChar = 'b';
+//					temp[2]=count;
+//					curveList.add(temp);
+//					temp = new Integer[]{0,0,0};
+//					count=0;
+//				}
+//			}
+//			else if (directionLL.get(i)=='l') {
+//				//temp[0]=temp[0]+1;
+//				//count++;
+//			}
+//			else if (directionLL.get(i)=='r') {
+//				temp[1]=temp[1]+1;
+//				count++;
+//			}
+//		}
+//		System.out.println("");
+//		
+//		Integer[] intArr = null;
+//		double result = 0.0;
+//		for (int i=0;i<curveList.size();i++) {
+//			intArr = curveList.get(i);
+//			int left_right = intArr[0]+intArr[1];
+//			result = (double)left_right/(double)intArr[2];
+//		}
+		
+//		System.out.println("curved result: " + round(result/curveList.size(),2));
+		
+		int tcount=0;
+		int bcount=0;
+		int lcount=0;
+		int rcount=0;
+		
+		for (int i=0;i<directionLL.size()/4;i++) {
+			if (directionLL.get(i)=='t') {
+				tcount++;
+			}
+			else if (directionLL.get(i)=='b') {
+				bcount++;
+			}
+			else if (directionLL.get(i)=='l') {
+				lcount++;
+			}
+			else if (directionLL.get(i)=='r') {
+				rcount++;
+			}
+		}
+		
+		int size = directionLL.size()/4;
+		
+		double ttemp = (double)tcount/(double)size;
+		double btemp = (double)bcount/(double)size;
+		double ltemp = (double)lcount/(double)size;
+		double rtemp = (double)rcount/(double)size;
+		
+//		System.out.print(round(ttemp,2) + ", ");
+//		System.out.print(round(btemp,2) + ", ");
+//		System.out.print(round(ltemp,2) + ", ");
+//		System.out.println(round(rtemp,2));
+//		
+//		System.out.println("");
+		
+	}
+	
 	
 	
 	private void edgeClassifier() {

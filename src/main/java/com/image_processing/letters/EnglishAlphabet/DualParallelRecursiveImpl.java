@@ -346,8 +346,8 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	////////////GETTERS/////////////
 
 	public void boxFeaturesInImage(BufferedImage b) {
-		boxFeatures(b, mapFeatures1);
-		boxFeatures(b, mapFeatures2);
+		boxFeatures(mapFeatures1);
+		boxFeatures(mapFeatures2);
 	}
 
 	private void findAverageFeatureSize() {

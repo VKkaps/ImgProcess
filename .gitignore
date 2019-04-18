@@ -31,9 +31,14 @@ Thumbs.db
 
 # Log file
 *.log
+Dockerfile.file
 
 # BlueJ files
 *.ctxt
+
+# Eclipse files
+*.metadata
+.settings/*
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

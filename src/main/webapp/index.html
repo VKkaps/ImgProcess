@@ -20,8 +20,10 @@
         <a href="#" class="navbar-brand">Image Processor</a>
       </div>
     </nav>
+    
     <div class="container">
       <div class="row">
+      
         <div class="col-md-8 m-auto">
           <div class="custom-file mb-3">
             <input type="file" class="custom-file-input" id="upload-file">
@@ -29,21 +31,11 @@
           </div>
           <canvas id="canvas"></canvas>
 
-          <div class="row mb-2">
-            <div class="col-md-12">
-              <button class="filter-btn sincity-add btn btn-dark btn-block">
-                  Grayscale
-               </button>
-            </div>
-          </div>
-
-
           <div class="row mt-4">
             <div class="col-md-12">
               <button id="process-btn" class="btn btn-danger btn-block" onclick="processImage()">Process Image</button>
             </div>
           </div>
-
 
           <div class="row mt-4">
             <div class="col-md-6">
@@ -54,6 +46,14 @@
             </div>
           </div>
         </div>
+        
+        
+        <div class="col-md-4">
+        	<h3 align="center">Identified Letters</h3>
+        	<p id="letters">.................</p>
+
+        </div>
+         
       </div>
     </div>
     

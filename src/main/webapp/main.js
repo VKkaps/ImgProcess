@@ -4,6 +4,7 @@ const ctx = canvas.getContext("2d");
 let img = new Image();
 let originalImg = new Image();
 let fileName = "";
+let letters = document.getElementById("letters");
 
 const uploadFile = document.getElementById("upload-file");
 const processBtn = document.getElementById("process-btn");
@@ -18,7 +19,6 @@ function processImage(){
 	var blob = dataURItoBlob(dataURL);
 	var formData = new FormData(document.forms[0]);
 	formData.append("file", blob);
-	
 	
 	function dataURItoBlob(dataURI) {
 	    // convert base64/URLEncoded data component to raw binary data held in a string
@@ -40,16 +40,28 @@ function processImage(){
 	    return new Blob([ia], {type:mimeString});
 	}
 
-	var xhttp = new XMLHttpRequest();
-
-	xhttp.onreadystatechange = function() {
+	var xhttp1 = new XMLHttpRequest();
+	var xhttp2 = new XMLHttpRequest();
+	
+	xhttp1.onreadystatechange = function() {
 	    if (this.readyState == 4 && this.status == 200) {
-	    	img.src = "data:image/jpg;base64, "+ xhttp.responseText;
-	    	
+	    	img.src = "data:image/jpg;base64, "+ xhttp1.responseText;
+	    	document.getElementById("letters").innerHTML = xhttp1.responseText;
 	    }
 	};
-	xhttp.open("post", "Image", true);	
-	xhttp.send(formData);
+	xhttp2.onreadystatechange = function() {
+	    if (this.readyState == 4 && this.status == 200) {
+	    	document.getElementById("letters").innerHTML = xhttp2.responseText;
+	    }
+	};
+
+	xhttp1.open("post", "Image", false);	
+
+	xhttp1.send(formData);
+	
+	xhttp2.open("get", "Image", false);	
+
+	xhttp2.send();
 }
 
 
