@@ -65,7 +65,7 @@ public class Pixel implements Comparable<Pixel>{
 	 * 
 	 * */
 	public void initializeIsNoticable(int imageAverageRGBvalue) {
-		if (pixelRGBAverage < imageAverageRGBvalue-60 || pixelRGBAverage < 50) isNoticable = true;
+		if (pixelRGBAverage < imageAverageRGBvalue-80 || pixelRGBAverage < 50) isNoticable = true;
 		else isNoticable = false;		
 	}
 	

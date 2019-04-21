@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.image_processing.letters.EnglishAlphabet.AlphaNumericPercentageCheck;;
+import com.image_processing.letters.EnglishAlphabet.Fonts.*;
 
 public class Feature {
 
@@ -70,6 +70,7 @@ public class Feature {
 	
 	char letter = '_';
 	StringBuilder percentMatch = new StringBuilder();
+	String font = "_";
 	
 
 	
@@ -93,63 +94,143 @@ public class Feature {
 		edgeClassifier();
 		identifyColumnPercentage();
 		identifyLetter();
-		
-		
+
 		//printDirectionList();
 		//printFeatureInfo();
 		//printIntegerArray();
 		//sectionPrint();
 		
-		System.out.print(percentMatch +  " ");
+		System.out.println(percentMatch + "%, " + letter);
+		System.out.println("Font: "+font);	
 	}
 
 	
 	public char identifyLetter() {
+		
+		double arialMatchPercentage = 0.0;
+		double tnrMatchPercentage = 0.0;
 
 		if (numOfLoops==0) {
 			// 43 total
 			
+			StringBuilder arialPercentMatch = new StringBuilder();
+			StringBuilder tnrPercentMatch = new StringBuilder();
 			
-			char[] chArr = new char[4];
-			chArr = AlphaNumericPercentageCheck.zeroLoop(sectionHMap);
+			char[] chArial = new char[6];
+			chArial = Arial_English.zeroLoop(sectionHMap);
 
-			for (int i=1;i<chArr.length;i++) {
-				percentMatch.append(chArr[i]);
+			for (int i=1;i<chArial.length;i++) {
+				arialPercentMatch.append(chArial[i]);
 			}
 			
-			
-			letter = chArr[0];
+			char[] chTNR = new char[6];
+			chTNR = TimesNewRoman_English.zeroLoop(sectionHMap);
 
+			for (int i=1;i<chTNR.length;i++) {
+				tnrPercentMatch.append(chTNR[i]);
+			}
+			
+			arialMatchPercentage = Double.parseDouble(arialPercentMatch.toString());
+			tnrMatchPercentage = Double.parseDouble(tnrPercentMatch.toString());
+
+			if (arialMatchPercentage>tnrMatchPercentage) {
+				letter = chArial[0];
+				percentMatch = arialPercentMatch;
+				font="Arial";
+			}
+			else if (tnrMatchPercentage>arialMatchPercentage) {
+				letter = chTNR[0];
+				percentMatch = tnrPercentMatch;
+				font="TNR";
+			}
+			else {
+				letter = chArial[0];
+				percentMatch = arialPercentMatch;
+				font="Arial";
+			}
+			
 		}
 		else if (numOfLoops==1) {
 			
-			char[] chArr = new char[4];
-			chArr = AlphaNumericPercentageCheck.oneLoop(sectionHMap);
+			StringBuilder arialPercentMatch = new StringBuilder();
+			StringBuilder tnrPercentMatch = new StringBuilder();
+			
+			char[] chArial = new char[4];
+			chArial = Arial_English.oneLoop(sectionHMap);
 
-			for (int i=1;i<chArr.length;i++) {
-				percentMatch.append(chArr[i]);
+			for (int i=1;i<chArial.length;i++) {
+				arialPercentMatch.append(chArial[i]);
+			}
+			
+			char[] chTNR = new char[4];
+			chTNR = TimesNewRoman_English.oneLoop(sectionHMap);
+
+			for (int i=1;i<chTNR.length;i++) {
+				tnrPercentMatch.append(chTNR[i]);
+			}
+			
+			arialMatchPercentage = Double.parseDouble(arialPercentMatch.toString());
+			tnrMatchPercentage = Double.parseDouble(tnrPercentMatch.toString());
+
+			if (arialMatchPercentage>tnrMatchPercentage) {
+				letter = chArial[0];
+				percentMatch = arialPercentMatch;
+				font="Arial";
+			}
+			else if (tnrMatchPercentage>arialMatchPercentage) {
+				letter = chTNR[0];
+				percentMatch = tnrPercentMatch;
+				font="TNR";
+			}
+			else {
+				letter = chArial[0];
+				percentMatch = arialPercentMatch;
+				font="Arial";
 			}
 			
 
-			letter = chArr[0];
-
 		}
 		else if (numOfLoops==2) {
-			// 2 total:
-			// B and 8
-			// potentially g...
-			char[] chArr = new char[4];
-			chArr = AlphaNumericPercentageCheck.twoLoop(sectionHMap);
+			
+			StringBuilder arialPercentMatch = new StringBuilder();
+			StringBuilder tnrPercentMatch = new StringBuilder();
+			
+			char[] chArial = new char[4];
+			chArial = Arial_English.twoLoop(sectionHMap);
 
-			for (int i=1;i<chArr.length;i++) {
-				percentMatch.append(chArr[i]);
+			for (int i=1;i<chArial.length;i++) {
+				arialPercentMatch.append(chArial[i]);
 			}
+			
+			char[] chTNR = new char[4];
+			chTNR = TimesNewRoman_English.twoLoop(sectionHMap);
 
-
-			letter = chArr[0];
+			for (int i=1;i<chTNR.length;i++) {
+				tnrPercentMatch.append(chTNR[i]);
+			}
+			
+			arialMatchPercentage = Double.parseDouble(arialPercentMatch.toString());
+			tnrMatchPercentage = Double.parseDouble(tnrPercentMatch.toString());
+			
+			
+			if (arialMatchPercentage>tnrMatchPercentage) {
+				letter = chArial[0];
+				percentMatch = arialPercentMatch;
+				font="Arial";
+			}
+			else if (tnrMatchPercentage>arialMatchPercentage) {
+				letter = chTNR[0];
+				percentMatch = tnrPercentMatch;
+				font="TNR";
+			}
+			else {
+				letter = chArial[0];
+				percentMatch = arialPercentMatch;
+				font="Arial";
+			}
+			
 		}
-		
-		if (percentMatch.charAt(2)<7) letter='_';
+
 		return letter;
 	}
 	
@@ -240,13 +321,6 @@ public class Feature {
 		double ltemp = (double)lcount/(double)size;
 		double rtemp = (double)rcount/(double)size;
 		
-//		System.out.print(round(ttemp,2) + ", ");
-//		System.out.print(round(btemp,2) + ", ");
-//		System.out.print(round(ltemp,2) + ", ");
-//		System.out.println(round(rtemp,2));
-//		
-//		System.out.println("");
-		
 	}
 	
 	
@@ -329,7 +403,7 @@ public class Feature {
 		double rowPercentage = (double)(lCount+rCount)/(double)featureWidth;
 
 		//A-edge
-		for (int i=0;i<circularArr.size()-4;i++) {
+		for (int i=0;i<directionLL.size()-4;i++) {
 			if (directionLL.get(i)=='r') {
 				if (directionLL.get(i+1)=='t') {
 					if (directionLL.get(i+2)=='t') {
@@ -385,7 +459,7 @@ public class Feature {
 		}	
 		
 		//c-curve check
-		for (int i=0;i<circularArr.size()-4;i++) {
+		for (int i=0;i<directionLL.size()-4;i++) {
 			if (directionLL.get(i)=='t') {
 				if (directionLL.get(i+1)=='r') {
 					if (directionLL.get(i+2)=='r') {
@@ -443,7 +517,7 @@ public class Feature {
 		
 		
 		//corner check
-		for (int i=0;i<circularArr.size()-3;i++) {
+		for (int i=0;i<directionLL.size()-3;i++) {
 			if (directionLL.get(i)=='b') {
 				if (directionLL.get(i+1)=='b') {
 					if (directionLL.get(i+2)=='r') {
