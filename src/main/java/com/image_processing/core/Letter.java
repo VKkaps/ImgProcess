@@ -11,7 +11,7 @@ import java.util.List;
 
 import com.image_processing.letters.EnglishAlphabet.Fonts.*;
 
-public class Letter {
+public class Letter implements Comparable<Letter>{
 
 	private Integer[][] featureIntArray; //2D Integer Array: 1 for Noticable, 0 for not noticable
 	private List<Pixel> featureGroup;  //ArrayList of Pixels in a Feature sorted in X direction
@@ -45,6 +45,9 @@ public class Letter {
 	private HashMap<Integer,double[]> sectionHMap = new HashMap<Integer,double[]>();
 	
 	double percentStraight=0.0;
+	
+	int x_coor;
+	int y_coor;
 	
 	
 	double curved_Percentage=0.0;
@@ -102,6 +105,7 @@ public class Letter {
 		
 		System.out.println(percentMatch + "%, " + letter);
 		System.out.println("Font: "+font);	
+		System.out.println(x_coor + ", " + y_coor);	
 	}
 
 	
@@ -234,7 +238,10 @@ public class Letter {
 		return letter;
 	}
 	
-	
+	@Override
+	public int compareTo(Letter l) {
+		return (this.getXcoor() - l.getXcoor());
+	}
 	
 	private void identifyColumnPercentage() {
 		
@@ -1319,6 +1326,9 @@ public class Letter {
 		boundaryArr[1] = first;
 		boundaryArr[3] = last+1;
 		
+		x_coor = boundaryArr[0];
+		y_coor = boundaryArr[1];
+		
 	}
 		
 	/*
@@ -1354,6 +1364,18 @@ public class Letter {
 	
 	public int getHeightOfFeature() {
 		return featureHeight;
+	}
+	
+	public int getXcoor() {
+		return x_coor;
+	}
+	
+	public int getYcoor() {
+		return y_coor;
+	}
+	
+	public char getLetter() {
+		return letter;
 	}
 	
 
@@ -1450,7 +1472,7 @@ public class Letter {
 		}
 		System.out.println();
 	}
-	
+		
 }
 
 

@@ -7,6 +7,8 @@ import java.awt.image.RescaleOp;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +31,8 @@ public abstract class AbstractProcessImage {
 	protected static Integer[][] imageBinaryArray = null;
 	protected int averageRGBPixelvalue;
 	protected List<Pixel> noticablePixList = new ArrayList<Pixel>();
+	
+	private HashMap<Integer, LinkedList<Integer>> orgMap = null;
 	
 	private Graphics2D g2d=null;
 	private final Color neon = new Color(58, 255, 20);	
@@ -86,9 +90,24 @@ public abstract class AbstractProcessImage {
 		g2d = rawImage.createGraphics();
 		g2d.setColor(neon);
 		
+		orgMap = new HashMap<Integer, LinkedList<Integer>>();
+		LinkedList<Integer> ll = new LinkedList<Integer>();
+		
 		for (Letter f : mapFeatures.values()) {
 			drawNeonBox(rawImage, f.getBoundaryArr());
+			ll.add(f.getXcoor());
+			if (!orgMap.containsKey(f.getYcoor())) {
+				orgMap.put(f.getYcoor(), ll);
+				ll = new LinkedList<Integer>();
+			}
+			else {
+				ll = orgMap.get(f.getYcoor());
+				ll.add(f.getXcoor());
+				orgMap.put(f.getYcoor(), ll);
+				ll = new LinkedList<Integer>();
+			}
 		}	
+		organizeLetters();
 		return rawImage;
 	}
 	
@@ -108,6 +127,13 @@ public abstract class AbstractProcessImage {
 		g2d.drawLine(fourCoordinates[2]+1, fourCoordinates[1]-1, fourCoordinates[2]+1, fourCoordinates[3]+1);
 
 	}
+	
+	
+	private void organizeLetters() {
+		
+	}
+	
+	
 		
 	/*
 	 * Static method to output a BufferedImage to a specified directory.

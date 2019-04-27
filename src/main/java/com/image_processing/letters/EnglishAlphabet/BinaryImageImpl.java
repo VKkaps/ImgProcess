@@ -2,12 +2,15 @@ package com.image_processing.letters.EnglishAlphabet;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
+import java.util.TreeMap;
 
 import com.image_processing.core.AbstractProcessImage;
 import com.image_processing.core.Letter;
@@ -23,6 +26,8 @@ public class BinaryImageImpl extends AbstractProcessImage{
 	
 	//Image is divided into 4 quadrants.  Each quadrant has its own features (letters) which are contained in these HashMaps
 	private Map<Integer, Letter> mapFeatures = new HashMap<Integer, Letter>();
+	
+	private TreeMap<Integer, LinkedList<Integer>> orgMap = null;
 	
 	//noticable, edge Pixel Queues for Parallelism processing purposes
 	private Queue<Pixel> Core1noticableEdgePixelsQueue;
@@ -65,6 +70,7 @@ public class BinaryImageImpl extends AbstractProcessImage{
 		sortAndInitQueues();
 		findFeatures();
 		identifyLetters();
+		organizeLetters();
 		index=0;
 	}
 
@@ -246,6 +252,112 @@ public class BinaryImageImpl extends AbstractProcessImage{
 		for (int i=0;i<mapFeatures.size();i++) {
 			str.insert(i, mapFeatures.get(i).identifyLetter());
 		}
+	}
+	
+	private void organizeLetters() {
+
+		orgMap = new TreeMap<Integer, LinkedList<Integer>>();
+		LinkedList<Integer> ll = new LinkedList<Integer>();
+		int totalHeight=0;
+		
+		for (Letter f : mapFeatures.values()) {
+			ll.add(f.getXcoor());
+			if (!orgMap.containsKey(f.getYcoor())) {
+				orgMap.put(f.getYcoor(), ll);
+				ll = new LinkedList<Integer>();
+			}
+			else {
+				ll = orgMap.get(f.getYcoor());
+				ll.add(f.getXcoor());
+				orgMap.put(f.getYcoor(), ll);
+				ll = new LinkedList<Integer>();
+			}
+			totalHeight+=f.getHeightOfFeature();
+		}	
+		int aveHeight = totalHeight/mapFeatures.size();
+
+		Set<Integer> s = orgMap.keySet();
+		Integer[] yArray = s.stream().toArray(Integer[]::new);
+		
+		//organize s by size
+		LinkedList<Integer> newL = new LinkedList<Integer>();
+		HashMap<Integer, List<Integer>> rowMap = new HashMap<Integer, List<Integer>>();
+		
+		if (yArray.length==1) {
+			newL.add(yArray[0]);
+			rowMap.put(rowMap.size(), newL);
+		}
+		else {
+			for (int i=0;i<yArray.length-1;i++) {
+				if(yArray[i+1]-yArray[i]<aveHeight/2) {
+					newL.add(yArray[i]);
+					if(i==yArray.length-2) {
+						newL.add(yArray[i+1]);
+						rowMap.put(rowMap.size(), newL);
+					}
+				}
+				else {
+					newL.add(yArray[i]);
+					rowMap.put(rowMap.size(), newL);
+					newL = new LinkedList<Integer>();
+					if(yArray[i+1]-yArray[i]>aveHeight/2) {
+						if(i==yArray.length-2) {
+							newL.add(yArray[i+1]);
+							rowMap.put(rowMap.size(), newL);
+						}
+					}
+				}
+			}
+		}
+		
+		List<Letter> list = new ArrayList<Letter>(mapFeatures.values());
+		//Sort edgePixList by X coordinate
+		Collections.sort(list);
+		
+		// sorted letters by X  AND  rowMap - which is number is rows
+		
+		// Map -> row to LettersInRow
+		TreeMap<Integer, List<Letter>> rowsOfLettersMap = new TreeMap<Integer, List<Letter>>();
+		System.out.println("\nNumber of rows: "+rowMap.size());
+		List<Letter> lettersInRow = null;
+		
+		List<Integer> tempRowY = null;
+		for (int i=0;i<rowMap.size();i++) {
+			tempRowY = rowMap.get(i);
+			for (Integer in : tempRowY) {
+				for (Letter l : list) {
+					if (l.getYcoor()==in) {
+						if (rowsOfLettersMap.get(i)==null) {
+							lettersInRow = new LinkedList<Letter>();
+							lettersInRow.add(l);
+							rowsOfLettersMap.put(i, lettersInRow);
+						}
+						else {
+							lettersInRow = rowsOfLettersMap.get(i);
+							lettersInRow.add(l);
+							rowsOfLettersMap.put(i, lettersInRow);
+						}
+					}
+				}
+			}
+			
+			
+		}
+		
+		List<Letter> temp = new LinkedList<Letter>();
+		str.delete(0, str.length());
+		for (int i=0;i<rowsOfLettersMap.size();i++) {
+			temp = rowsOfLettersMap.get(i);
+			Collections.sort(temp);
+			for (Letter l : temp) {
+//				System.out.print(l.getLetter());
+				str.append(l.getLetter());
+			}
+//			System.out.print("\n");
+			str.append("\n");
+		}
+
+		System.out.println(str);		
 	}
 	
 	
