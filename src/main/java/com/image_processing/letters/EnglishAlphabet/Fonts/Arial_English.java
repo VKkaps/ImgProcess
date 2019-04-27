@@ -1360,6 +1360,8 @@ public class Arial_English {
 		
 		percentResult = round(aver,6);
 		
+		percentageHMap.put(percentResult, 'V');
+		
 		resultArr[18] = percentResult;
 		
 		
@@ -2565,7 +2567,10 @@ public class Arial_English {
 		temp[1] = s.charAt(0);
 		temp[2] = s.charAt(1);
 		temp[3] = s.charAt(2);
-		if (s.length()>3) {
+		if (s.length()==4) {
+			temp[4] = s.charAt(3);
+		}
+		else if (s.length()==5) {
 			temp[4] = s.charAt(3);
 			temp[5] = s.charAt(4);
 		}
@@ -3573,7 +3578,10 @@ public class Arial_English {
 		temp[1] = s.charAt(0);
 		temp[2] = s.charAt(1);
 		temp[3] = s.charAt(2);
-		if (s.length()>3) {
+		if (s.length()==4) {
+			temp[4] = s.charAt(3);
+		}
+		else if (s.length()==5) {
 			temp[4] = s.charAt(3);
 			temp[5] = s.charAt(4);
 		}
@@ -3726,7 +3734,10 @@ public class Arial_English {
 		temp[1] = s.charAt(0);
 		temp[2] = s.charAt(1);
 		temp[3] = s.charAt(2);
-		if (s.length()>3) {
+		if (s.length()==4) {
+			temp[4] = s.charAt(3);
+		}
+		else if (s.length()==5) {
 			temp[4] = s.charAt(3);
 			temp[5] = s.charAt(4);
 		}

@@ -16,8 +16,7 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.codec.binary.Base64;
 
-import com.image_processing.letters.EnglishAlphabet.DualParallelRecursiveImpl;
-import com.image_processing.letters.EnglishAlphabet.SequentialRecursiveImpl;
+import com.image_processing.letters.EnglishAlphabet.*;
 
 
 /**
@@ -40,9 +39,13 @@ public class ProcessImageServlet extends HttpServlet {
         BufferedImage imBuff = ImageIO.read(fileContent);
 
         // Choose implementation here
-        SequentialRecursiveImpl s = new SequentialRecursiveImpl(imBuff);
-		s.boxFeaturesInImage();
-		str = s.getIdentifiedText();
+//        SequentialRecursiveImpl s = new SequentialRecursiveImpl(imBuff);
+//		s.boxFeaturesInImage();
+//		str = s.getIdentifiedText();
+		
+        BinaryImageImpl st = new BinaryImageImpl(imBuff);
+		st.boxFeaturesInImage();
+		str = st.getIdentifiedText();
 
         String base64String = encodeToString(imBuff, "jpg");
         response.setContentType("text/html");

@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import com.image_processing.core.AbstractProcessImage;
-import com.image_processing.core.Feature;
+import com.image_processing.core.Letter;
 import com.image_processing.core.Pixel;
 
 
@@ -31,8 +31,8 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	private List<Pixel> noticablePixList2 = new ArrayList<Pixel>();
 	
 	//Image is divided into 2 halves.  Each half has its own features (letters) which are contained in these HashMaps
-	private Map<Integer, Feature> mapFeatures1 = new HashMap<Integer, Feature>();
-	private Map<Integer, Feature> mapFeatures2 = new HashMap<Integer, Feature>();
+	private Map<Integer, Letter> mapFeatures1 = new HashMap<Integer, Letter>();
+	private Map<Integer, Letter> mapFeatures2 = new HashMap<Integer, Letter>();
 	
 	//2 isolated noticable, edge Pixel Queues for Parallelism processing purposes
 	private Queue<Pixel> Core1noticableEdgePixelsQueue;
@@ -55,6 +55,11 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 		sortAndInitQueues();
 		findFeatures();  //concurrent
 		//findAverageFeatureSize();
+	}
+	
+	
+	public void prepareImageForProcessing() {
+		
 	}
 	
 	
@@ -190,7 +195,6 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	 * findFeature methods have isolated resources, so no need for Synchronization.
 	 * 
 	 * */
-	@Override
 	protected void findFeatures() {
 		final long startTimeOut = System.currentTimeMillis();
 		
@@ -220,7 +224,7 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	protected void findNoticablePixels1() {
 
 		for (int y = 1; y < imageHeight; y++) {
-		    for (int x = 1; x < imageWidth_middle; x++) {
+		    for (int x = 1; x < imageWidth; x++) {
 		    	
 		    	/*For each Pixel in image, determine if it is noticable by passing in 
 		    	 * the Image averageRGBPixelvalue.
@@ -237,7 +241,7 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	protected void findNoticablePixels2() {
 
 		for (int y = 1; y < imageHeight; y++) {
-		    for (int x = imageWidth_middle+1; x < imageWidth; x++) {
+		    for (int x = imageWidth+1; x < imageWidth; x++) {
 		    	
 		    	/*For each Pixel in image, determine if it is noticable by passing in 
 		    	 * the Image averageRGBPixelvalue.
@@ -267,7 +271,7 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 				preorderTraversal1(Core1noticableEdgePixelsQueue.remove(), feature1);
 				
 				if (feature1.size()>20) {
-					mapFeatures1.put(mapPointer1, new Feature(feature1)); //, rawImage
+					mapFeatures1.put(mapPointer1, new Letter(feature1)); //, rawImage
 					mapPointer1++;
 				}
 				feature1 = new ArrayList<Pixel>();
@@ -283,7 +287,7 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	/*
 	 * Recursive PreOrder Traversal of noticablePixels.  Essentially builds Features via recursion.
 	 * If a current noticable pixel has a neighboring noticable pixel add current 
-	 * noticable pixel to a growing pixel list, which is a Feature.  Then, go thru
+	 * noticable pixel to a growing pixel list, which is a Letter.  Then, go thru
 	 * Recursive process starting with the current noticable pixel's right neighbor
 	 * Pixel.
 	 */
@@ -311,7 +315,7 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 				preorderTraversal2(Core2noticableEdgePixelsQueue.remove(), feature2);
 				
 				if (feature2.size()>20) {
-					mapFeatures2.put(mapPointer2, new Feature(feature2)); //, rawImage
+					mapFeatures2.put(mapPointer2, new Letter(feature2)); //, rawImage
 					mapPointer2++;
 				}
 				feature2 = new ArrayList<Pixel>();
@@ -351,13 +355,13 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	}
 
 	private void findAverageFeatureSize() {
-		System.out.println("Average area of Feature 1 in pixels: " + getAverageFeature1Size());
-		System.out.println("Average area of Feature 2 in pixels: " + getAverageFeature2Size());
+		System.out.println("Average area of Letter 1 in pixels: " + getAverageFeature1Size());
+		System.out.println("Average area of Letter 2 in pixels: " + getAverageFeature2Size());
 	}
 		
 	private int getAverageFeature1Size() {
-		// mapFeatures1 = new HashMap<Integer, Feature>();
-		Feature f = null;
+		// mapFeatures1 = new HashMap<Integer, Letter>();
+		Letter f = null;
 		int ave=0;
 		for (int i=0; i<mapFeatures1.size(); i++) {
 			f = mapFeatures1.get(i);
@@ -368,8 +372,8 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	}
 	
 	private int getAverageFeature2Size() {
-		// mapFeatures2 = new HashMap<Integer, Feature>();
-		Feature f = null;
+		// mapFeatures2 = new HashMap<Integer, Letter>();
+		Letter f = null;
 		int ave=0;
 		for (int i=0; i<mapFeatures2.size(); i++) {
 			f = mapFeatures2.get(i);
@@ -397,6 +401,13 @@ public class DualParallelRecursiveImpl extends AbstractProcessImage{
 	
 	public int getFeatures() {
 		return mapFeatures1.size() + mapFeatures2.size();
+	}
+
+
+	@Override
+	protected void processImage() {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

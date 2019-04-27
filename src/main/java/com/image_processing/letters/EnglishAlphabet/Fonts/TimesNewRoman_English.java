@@ -2566,7 +2566,10 @@ public class TimesNewRoman_English {
 		temp[1] = s.charAt(0);
 		temp[2] = s.charAt(1);
 		temp[3] = s.charAt(2);
-		if (s.length()>3) {
+		if (s.length()==4) {
+			temp[4] = s.charAt(3);
+		}
+		else if (s.length()==5) {
 			temp[4] = s.charAt(3);
 			temp[5] = s.charAt(4);
 		}
@@ -3485,11 +3488,14 @@ public class TimesNewRoman_English {
 		temp[1] = s.charAt(0);
 		temp[2] = s.charAt(1);
 		temp[3] = s.charAt(2);
-		if (s.length()>3) {
+		if (s.length()==4) {
+			temp[4] = s.charAt(3);
+		}
+		else if (s.length()==5) {
 			temp[4] = s.charAt(3);
 			temp[5] = s.charAt(4);
 		}
-
+		
 		return temp;
 	}
 	
@@ -3686,7 +3692,10 @@ public class TimesNewRoman_English {
 		temp[1] = s.charAt(0);
 		temp[2] = s.charAt(1);
 		temp[3] = s.charAt(2);
-		if (s.length()>3) {
+		if (s.length()==4) {
+			temp[4] = s.charAt(3);
+		}
+		else if (s.length()==5) {
 			temp[4] = s.charAt(3);
 			temp[5] = s.charAt(4);
 		}

@@ -12,6 +12,8 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import impl.*;
+
 
 public abstract class AbstractProcessImage {
 
@@ -20,10 +22,11 @@ public abstract class AbstractProcessImage {
 	
 	protected final int imageWidth;
 	protected final int imageHeight; 
-	protected final int imageWidth_middle;
-	protected final int imageHeight_middle;
+	protected final int halfimageWidth;
+	protected final int halfimageHeight;
 	
 	protected static Pixel[][] imagePixelArray = null;
+	protected static Integer[][] imageBinaryArray = null;
 	protected int averageRGBPixelvalue;
 	protected List<Pixel> noticablePixList = new ArrayList<Pixel>();
 	
@@ -37,35 +40,12 @@ public abstract class AbstractProcessImage {
 		enhancedImage = b;
 		imageWidth = rawImage.getWidth();
 		imageHeight = rawImage.getHeight();
-		imageWidth_middle = (imageWidth/2);
-		imageHeight_middle = (imageHeight/2);
-		enhanceImage(b);
+		halfimageWidth = (imageWidth/2);
+		halfimageHeight= (imageHeight/2);
 		imagePixelArray = new Pixel[imageWidth][imageHeight]; //2-D Array comprised of type Pixel
+		imageBinaryArray = new VFK_Method().BinarizeImage(b);
 		initImagePixelArray();  // Load Pixels into above array
 		findAverageRGBPixelValueForImage();
-	}
-	
-	private void enhanceImage(BufferedImage b) {
-		
-        for(int y=0; y<imageHeight; y++) {
-            
-            for(int x=0; x<imageWidth; x++) {
-            
-               Color c = new Color(b.getRGB(x, y));
-               int red = (int)(c.getRed() * 0.299);
-               int green = (int)(c.getGreen() * 0.587);
-               int blue = (int)(c.getBlue() *0.114);
-               Color newColor = new Color(red+green+blue,
-               
-               red+green+blue,red+green+blue);
-               
-               enhancedImage.setRGB(x,y,newColor.getRGB());
-            }
-         }
-        
-        RescaleOp rescaleOp = new RescaleOp(1.2f, 10, null);
-        rescaleOp.filter(enhancedImage, enhancedImage);  // Source and destination are the same.
-
 	}
 	
 
@@ -102,11 +82,11 @@ public abstract class AbstractProcessImage {
 	 * Draw a Neon box around each Feature.
 	 * getBoundaryArr returns an int Array from the Feature of lowest/highest X and Y pixels
 	 * */	
-	public BufferedImage boxFeatures(Map<Integer, Feature> mapFeatures) {
+	public BufferedImage boxFeatures(Map<Integer, Letter> mapFeatures) {
 		g2d = rawImage.createGraphics();
 		g2d.setColor(neon);
 		
-		for (Feature f : mapFeatures.values()) {
+		for (Letter f : mapFeatures.values()) {
 			drawNeonBox(rawImage, f.getBoundaryArr());
 		}	
 		return rawImage;
@@ -187,11 +167,8 @@ public abstract class AbstractProcessImage {
 	
 	
 	// all child classes need their own way of implementing findNoticablePixels()
-	protected abstract void findNoticablePixels();
-	
-	// all child classes need their own way of implementing findFeatures()
-	protected abstract void findFeatures();
+	protected abstract void processImage();
+
 	
 }
-
 

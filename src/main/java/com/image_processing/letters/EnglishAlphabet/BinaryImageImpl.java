@@ -19,7 +19,7 @@ import com.image_processing.core.Pixel;
  *  processing an Image.  
  * 
  * */
-public class SequentialRecursiveImpl extends AbstractProcessImage{
+public class BinaryImageImpl extends AbstractProcessImage{
 	
 	//Image is divided into 4 quadrants.  Each quadrant has its own features (letters) which are contained in these HashMaps
 	private Map<Integer, Letter> mapFeatures = new HashMap<Integer, Letter>();
@@ -53,7 +53,7 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 	int index=0;
 
 
-	public SequentialRecursiveImpl(BufferedImage b) {
+	public BinaryImageImpl(BufferedImage b) {
 		super(b);
 		run();
 	}
@@ -68,10 +68,6 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 		index=0;
 	}
 
-
-	public void prepareImageForProcessing() {
-		
-	}
 
 	/*
 	 * Initializes the parent field 'noticablePixList'.  A pixel is determined to be noticable if 
@@ -93,8 +89,10 @@ public class SequentialRecursiveImpl extends AbstractProcessImage{
 		    	 * If it is noticable, add it to the noticablePix list.
 		    	 * */
 		    	
-		    	imagePixelArray[x][y].initializeIsNoticable(averageRGBPixelvalue);
-		    	if (imagePixelArray[x][y].isNoticable()) noticablePixList.add(imagePixelArray[x][y]);
+		    	if (imageBinaryArray[x][y]==1) {
+		    		imagePixelArray[x][y].setIsNoticable();
+		    		noticablePixList.add(imagePixelArray[x][y]);
+		    	}
 		    }
 		}
 		

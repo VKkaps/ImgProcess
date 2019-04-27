@@ -69,6 +69,10 @@ public class Pixel implements Comparable<Pixel>{
 		else isNoticable = false;		
 	}
 	
+	public void setIsNoticable() {
+		isNoticable=true;
+	}
+	
 	
 	/* This method is called externally after initializeNeighborPixels method has run.
 	 * The purpose is to check all neighbor pixels for a particular pixel, to see if the
