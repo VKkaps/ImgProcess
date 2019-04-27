@@ -8,7 +8,7 @@ Example:
 
 To run with Docker:
 
-docker run --rm -e CATALINA_OPTS="-Xms2048m" -it -p 8080:8080 vkapustin/img-proc:3.1
+docker run --rm -e CATALINA_OPTS="-Xms2048m" -it -p 8080:8080 vkapustin/img-proc:3.2
 
 Chrome webpage: http://localhost:8080/ImgProcess/
 
