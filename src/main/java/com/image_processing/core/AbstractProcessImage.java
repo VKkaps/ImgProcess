@@ -14,7 +14,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import impl.*;
+//import impl.*;
 
 
 public abstract class AbstractProcessImage {
@@ -47,7 +47,7 @@ public abstract class AbstractProcessImage {
 		halfimageWidth = (imageWidth/2);
 		halfimageHeight= (imageHeight/2);
 		imagePixelArray = new Pixel[imageWidth][imageHeight]; //2-D Array comprised of type Pixel
-		imageBinaryArray = new VFK_Method().BinarizeImage(b);
+		//imageBinaryArray = new VFK_Method().BinarizeImage(b);
 		initImagePixelArray();  // Load Pixels into above array
 		findAverageRGBPixelValueForImage();
 	}

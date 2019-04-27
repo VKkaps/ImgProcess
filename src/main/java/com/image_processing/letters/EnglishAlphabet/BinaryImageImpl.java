@@ -95,10 +95,13 @@ public class BinaryImageImpl extends AbstractProcessImage{
 		    	 * If it is noticable, add it to the noticablePix list.
 		    	 * */
 		    	
-		    	if (imageBinaryArray[x][y]==1) {
-		    		imagePixelArray[x][y].setIsNoticable();
-		    		noticablePixList.add(imagePixelArray[x][y]);
-		    	}
+		    	imagePixelArray[x][y].initializeIsNoticable(averageRGBPixelvalue);
+		    	if (imagePixelArray[x][y].isNoticable()) noticablePixList.add(imagePixelArray[x][y]);
+		    	
+//		    	if (imageBinaryArray[x][y]==1) {
+//		    		imagePixelArray[x][y].setIsNoticable();
+//		    		noticablePixList.add(imagePixelArray[x][y]);
+//		    	}
 		    }
 		}
 		
